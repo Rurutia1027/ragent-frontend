@@ -8,7 +8,7 @@ export interface StreamHandlers {
     onDone?: () => void;  
     onCancel?: (payload: CompletionPayload) => void; 
     onReject?: (payload: MessageDeltaPayload) => void; 
-    onTitle?:(payload: MessageDeltaPayload) => void; 
+    onTitle?: (payload: { title: string }) => void; 
     onError?: (error: Error) => void; 
     onEvent?: (event: string,payload: unknown) => void; 
 }
@@ -18,7 +18,7 @@ export interface StreamOptions {
     headers?: Record<string, string>;  
     signal?: AbortSignal;  
     retryCount?: number; 
-    retryDelayms?: number; 
+    retryDelayMs?: number; 
 }
 
 function parseData(raw: string): unknown {
@@ -91,16 +91,19 @@ async function readSseStream(response: Response, handlers: StreamHandlers, signa
 
     }; 
     
-    while (true) {
+    let reading = true;
+    while (reading) {
         if (signal?.aborted) {
             reader.cancel();
-            break; 
+            reading = false;
+            break;
         }
 
         const { value, done }  = await reader.read(); 
         if (done) {
-            dispatchEvent(); 
-            break; 
+            dispatchEvent();
+            reading = false;
+            break;
         }
 
         buffer += decoder.decode(value , {stream: true}); 

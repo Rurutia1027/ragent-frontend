@@ -1,13 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
-function Placeholder({ title, path }: { title: string; path: string }) {
-  return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "2rem" }}>
-      <h1>{title}</h1>
-      <p>{path}</p>
-    </main>
-  );
-}
+import { Placeholder } from "@/components/Placeholder";
 
 export const router = createBrowserRouter([
   {

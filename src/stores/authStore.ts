@@ -1,8 +1,16 @@
-// @ts-nocheck
-/* eslint-disable */
+import { create } from "zustand";
 
-import { create } from "zustand"; 
-import { toast } from "sonner"; 
+import type { User } from "@/types";
+import { storage } from "@/utils/storage";
 
-import type { User } from "@/types"; 
-import { storage } from "@/utils/storage";   
+interface AuthState {
+  user: User | null;
+  checkAuth: () => void;
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  checkAuth: () => {
+    set({ user: storage.getUser() });
+  },
+}));

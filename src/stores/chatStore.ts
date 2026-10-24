@@ -1,10 +1,6 @@
-import { create } from "zustand";  
-import { toast } from "sonner";  
+import { create } from "zustand";
 
-import type { CompletionPayload, FeedbackValue, Message, MessageDeltaPayload, Session } from "@/types";
-import { buildQuery } from "@/utils/helpers"; 
-import { createStreamResponse } from "@/hooks/useStreamResponse";
-import {storage} from "@/utils/storage";  
+import type { FeedbackValue, Message, Session } from "@/types";
 
 interface ChatState {
     sessions: Session[]; 
@@ -35,13 +31,13 @@ interface ChatState {
     submitFeedback: (messageId: string, feedback: FeedbackValue) => Promise<void>; 
 }
 
-function mapVoteToFeedback(vote?: number | null): FeedbackValue {
+export function mapVoteToFeedback(vote?: number | null): FeedbackValue {
     if (vote === 1) return "like"; 
     if (vote === -1) return "dislike"; 
     return null; 
 }
 
-function upsertSession(sessions: Session[], next: Session) {
+export function upsertSession(sessions: Session[], next: Session) {
     const index = sessions.findIndex((session) => session.id === next.id); 
     const updated = [...sessions]; 
     if (index >= 0) {
@@ -57,15 +53,15 @@ function upsertSession(sessions: Session[], next: Session) {
     }); 
 }
 
-function computeThinkingDuration(startAt?: number | null) {
+export function computeThinkingDuration(startAt?: number | null) {
     if (!startAt) return undefined; 
     const seconds = Math.round((Date.now() - startAt) / 1000); 
     return Math.max(1, seconds)
 }
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 
-export const useChatStore = create<ChatState>((set, get) => ({
+export const useChatStore = create<ChatState>(() => ({
     sessions: [],
     currentSessionId: null,
     messages: [],
