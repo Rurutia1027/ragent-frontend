@@ -7,7 +7,16 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 60000, 
 });
+
+export function setAuthToken(token: string) {
+    if (token) {
+        api.defaults.headers.common.Authorization = token; 
+    } else {
+        delete api.defaults.headers.common.Authorization; 
+    }
+}
 
 api.interceptors.request.use((config) => {
   const token = storage.getToken();
@@ -18,12 +27,40 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
-  (error: unknown) => {
-    const message = axios.isAxiosError<{ message?: string }>(error)
-      ? error.response?.data?.message || error.message
-      : "Request failed";
-    toast.error(message);
-    return Promise.reject(error);
+  (response) => {
+    const payload = response.data; 
+    if (payload && typeof payload === "object" && "code" in payload) {
+        if (payload.code !== "0") {
+            const message = payload.message || "Request failed";  
+            const isAuthExpired = typeof message === "string" && message.includes("Not login");  
+            if (isAuthExpired) {
+                storage.clearAuth(); 
+                if (window.location.pathname !== "/login") {
+                    window.location.href = "/login"; 
+                }
+            }
+            return Promise.reject(new Error(message)); 
+        }
+        return payload.data; 
+    }
+    return payload; 
   },
+  (error) => {
+    if (error?.response?.status === 401) {
+        storage.clearAuth(); 
+        if (window.location.pathname !== "/login") {
+            window.location.href = "/login"; 
+        }
+    }
+    const responseData = error?.response?.data; 
+    if (responseData && typeof responseData === "object" && "message" in responseData 
+            && responseData.message) {
+        toast.error(responseData.message); 
+    } else if (error?.code === "ERR_NETWORK") {
+        toast.error("Network error, please check your internet connection"); 
+    } else {
+        toast.error(error?.message || "Network issue"); 
+    }
+    return Promise.reject(error);  
+  }
 );
