@@ -3,17 +3,18 @@ import { Github, Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useChatStore } from "@/stores/chatStore";
+import type { Session } from "@/types";
 
 interface HeaderProps {
   onToggleSidebar: () => void;
 }
 
 export function Header({ onToggleSidebar }: HeaderProps) {
-  const { currentSessionId, sesisons } = useChatStore();
+  const { currentSessionId, sessions } = useChatStore();
   const [startCount, setStartCount] = React.useState<number | null>(null);
   const currentSession = React.useMemo(
-    () => sesisons.find((session: Session) => session.id === currentSessionId),
-    [sesisons, currentSessionId]
+    () => sessions.find((session: Session) => session.id === currentSessionId),
+    [sessions, currentSessionId]
   );
 
   React.useEffect(() => {
