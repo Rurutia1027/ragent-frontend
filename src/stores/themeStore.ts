@@ -11,5 +11,5 @@ export const useThemeStore = create<ThemeState>((set) => ({
   theme: null,
   initialize: () => {
     set({ theme: storage.getTheme() });
-  },
+  }
 }));

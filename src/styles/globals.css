@@ -1519,7 +1519,10 @@ html.dark *::-webkit-scrollbar-thumb:hover {
     background: transparent;
     border: none;
     cursor: pointer;
-    transition: background-color 150ms ease, color 150ms ease, opacity 150ms ease;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease,
+      opacity 150ms ease;
     opacity: 0;
     flex-shrink: 0;
   }
@@ -1660,7 +1663,9 @@ html.dark *::-webkit-scrollbar-thumb:hover {
     background: transparent;
     border: none;
     cursor: pointer;
-    transition: background-color 150ms ease, color 150ms ease;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
   }
 
   .trace-brief-id-copy:hover {
@@ -1990,7 +1995,6 @@ html.dark *::-webkit-scrollbar-thumb:hover {
       flex-direction: column;
       align-items: flex-start;
     }
-
   }
 
   @media (max-width: 640px) {

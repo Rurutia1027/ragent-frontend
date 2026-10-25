@@ -31,12 +31,20 @@ export const formatRelativeTime = (value?: string | null) => {
   const diffHours = differenceInHours(now, date);
   if (diffMinutes < 1) return "刚刚";
   if (diffMinutes < 60) return `${diffMinutes} 分钟前`;
-  if (date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
+  if (
+    date.getDate() === now.getDate() &&
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear()
+  ) {
     return `${diffHours} 小时前`;
   }
   const yesterday = new Date(now);
   yesterday.setDate(yesterday.getDate() - 1);
-  if (date.getDate() === yesterday.getDate() && date.getMonth() === yesterday.getMonth() && date.getFullYear() === yesterday.getFullYear()) {
+  if (
+    date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear()
+  ) {
     return `昨天 ${format(date, "HH:mm")}`;
   }
   const weekStart = getWeekStart(now);

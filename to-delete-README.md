@@ -60,20 +60,20 @@ Log in. The app lands on `/chat`. The engine setting chooses the knowledge page 
 
 Copy `src/pages/admin/AdminLayout.tsx` and `src/components/admin/` first, then add one row below, uncomment that route, and run again. The route prefix is `/admin`. The logged-in role must be `admin`.
 
-| Stop and run after | Copy | Route |
-|---|---|---|
-| Shell | `AdminLayout.tsx`, `src/components/admin/` | `/admin` redirects to dashboard once that page exists |
-| Dashboard | `pages/admin/dashboard/`, `services/dashboardService.ts` | `/admin/dashboard` |
-| Knowledge | `pages/admin/knowledge/`, `components/document/`, `pages/DocPreviewPage.tsx`, `services/knowledgeService.ts` | `/admin/knowledge`, `/preview/doc/:docId` |
-| Knowledge graph | `pages/admin/knowledge-graph/`, `services/knowledgeGraphService.ts` | `/admin/knowledge-graph` |
-| Intent tree | `pages/admin/intent-tree/`, `services/intentTreeService.ts` | `/admin/intent-tree`, `/admin/intent-list` |
-| Ingestion | `pages/admin/ingestion/`, `services/ingestionService.ts` | `/admin/ingestion` |
-| Traces | `pages/admin/traces/`, `services/ragTraceService.ts` | `/admin/traces` |
-| Change logs | `pages/admin/change-logs/`, `pages/ChangeLogsPage.tsx`, `services/bizChangeLogService.ts` | `/admin/change-logs`, `/change-logs` |
-| Settings | `pages/admin/settings/`, `services/settingsService.ts` is already in pile 2 | `/admin/settings` |
-| Sample questions | `pages/admin/sample-questions/`, `services/sampleQuestionService.ts` | `/admin/sample-questions` |
-| Term mappings | `pages/admin/query-term-mapping/`, `services/queryTermMappingService.ts` | `/admin/mappings` |
-| Agents | `pages/admin/agents/`, `pages/admin/agent-skills/` | `/admin/agents`, `/admin/agent-skills` |
-| Users | `pages/admin/users/`, `services/userService.ts` | `/admin/users` |
+| Stop and run after | Copy                                                                                                         | Route                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| Shell              | `AdminLayout.tsx`, `src/components/admin/`                                                                   | `/admin` redirects to dashboard once that page exists |
+| Dashboard          | `pages/admin/dashboard/`, `services/dashboardService.ts`                                                     | `/admin/dashboard`                                    |
+| Knowledge          | `pages/admin/knowledge/`, `components/document/`, `pages/DocPreviewPage.tsx`, `services/knowledgeService.ts` | `/admin/knowledge`, `/preview/doc/:docId`             |
+| Knowledge graph    | `pages/admin/knowledge-graph/`, `services/knowledgeGraphService.ts`                                          | `/admin/knowledge-graph`                              |
+| Intent tree        | `pages/admin/intent-tree/`, `services/intentTreeService.ts`                                                  | `/admin/intent-tree`, `/admin/intent-list`            |
+| Ingestion          | `pages/admin/ingestion/`, `services/ingestionService.ts`                                                     | `/admin/ingestion`                                    |
+| Traces             | `pages/admin/traces/`, `services/ragTraceService.ts`                                                         | `/admin/traces`                                       |
+| Change logs        | `pages/admin/change-logs/`, `pages/ChangeLogsPage.tsx`, `services/bizChangeLogService.ts`                    | `/admin/change-logs`, `/change-logs`                  |
+| Settings           | `pages/admin/settings/`, `services/settingsService.ts` is already in pile 2                                  | `/admin/settings`                                     |
+| Sample questions   | `pages/admin/sample-questions/`, `services/sampleQuestionService.ts`                                         | `/admin/sample-questions`                             |
+| Term mappings      | `pages/admin/query-term-mapping/`, `services/queryTermMappingService.ts`                                     | `/admin/mappings`                                     |
+| Agents             | `pages/admin/agents/`, `pages/admin/agent-skills/`                                                           | `/admin/agents`, `/admin/agent-skills`                |
+| Users              | `pages/admin/users/`, `services/userService.ts`                                                              | `/admin/users`                                        |
 
 `frontend/tests/`, `frontend/harness/`, and `src/hooks/useGitHubStars.ts` stay out until the screen they cover is already running.

@@ -12,5 +12,5 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   checkAuth: () => {
     set({ user: storage.getUser() });
-  },
+  }
 }));
