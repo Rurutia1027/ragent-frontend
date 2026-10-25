@@ -10,7 +10,7 @@ export const api = axios.create({
   timeout: 60000
 });
 
-export function setAuthToken(token: string) {
+export function setAuthToken(token: string | null) {
   if (token) {
     api.defaults.headers.common.Authorization = token;
   } else {

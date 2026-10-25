@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { toast } from "sonner";
-import type { CompletionPayload, FeedbackValue, Message, MessageDeltaPayload, Session } from "@/types";
+import type {
+  CompletionPayload,
+  FeedbackValue,
+  Message,
+  MessageDeltaPayload,
+  Session
+} from "@/types";
 import {
   listMessages,
   listSessions,
@@ -281,151 +287,68 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const token = storage.getToken();
 
     const handlers = {
-        onMeta: (payload: { conversationId: string; taskId: string }) => {
-          if (get().streamingMessageId !== assistantId) return;
-          const nextId = payload.conversationId || get().currentSessionId;
-          if (!nextId) return;
+      onMeta: (payload: { conversationId: string; taskId: string }) => {
+        if (get().streamingMessageId !== assistantId) return;
+        const nextId = payload.conversationId || get().currentSessionId;
+        if (!nextId) return;
+        const lastTime = new Date().toISOString();
+        const existing = get().sessions.find((session) => session.id === nextId);
+        set((state) => ({
+          currentSessionId: nextId,
+          isCreatingNew: false,
+          streamTaskId: payload.taskId,
+          sessions: upsertSession(state.sessions, {
+            id: nextId,
+            title: existing?.title || "新对话",
+            lastTime
+          })
+        }));
+        if (get().cancelRequested) {
+          stopTask(payload.taskId).catch(() => null);
+        }
+      },
+      onMessage: (payload: MessageDeltaPayload) => {
+        if (!payload || typeof payload !== "object") return;
+        if (payload.type !== "response") return;
+        get().appendStreamContent(payload.delta);
+      },
+      onThinking: (payload: MessageDeltaPayload) => {
+        if (!payload || typeof payload !== "object") return;
+        if (payload.type !== "think") return;
+        get().appendThinkingContent(payload.delta);
+      },
+      onReject: (payload: MessageDeltaPayload) => {
+        if (!payload || typeof payload !== "object") return;
+        get().appendStreamContent(payload.delta);
+      },
+      onFinish: (payload: CompletionPayload) => {
+        if (get().streamingMessageId !== assistantId) return;
+        if (!payload) return;
+        if (payload.title && get().currentSessionId) {
+          get().updateSessionTitle(get().currentSessionId as string, payload.title);
+        }
+        const currentId = get().currentSessionId;
+        if (currentId) {
           const lastTime = new Date().toISOString();
-          const existing = get().sessions.find((session) => session.id === nextId);
+          const existingTitle =
+            get().sessions.find((session) => session.id === currentId)?.title || "新对话";
+          const nextTitle = payload.title || existingTitle;
           set((state) => ({
-            currentSessionId: nextId,
-            isCreatingNew: false,
-            streamTaskId: payload.taskId,
             sessions: upsertSession(state.sessions, {
-              id: nextId,
-              title: existing?.title || "新对话",
+              id: currentId,
+              title: nextTitle,
               lastTime
             })
           }));
-          if (get().cancelRequested) {
-            stopTask(payload.taskId).catch(() => null);
-          }
-        },
-        onMessage: (payload: MessageDeltaPayload) => {
-          if (!payload || typeof payload !== "object") return;
-          if (payload.type !== "response") return;
-          get().appendStreamContent(payload.delta);
-        },
-        onThinking: (payload: MessageDeltaPayload) => {
-          if (!payload || typeof payload !== "object") return;
-          if (payload.type !== "think") return;
-          get().appendThinkingContent(payload.delta);
-        },
-        onReject: (payload: MessageDeltaPayload) => {
-          if (!payload || typeof payload !== "object") return;
-          get().appendStreamContent(payload.delta);
-        },
-        onFinish: (payload: CompletionPayload) => {
-          if (get().streamingMessageId !== assistantId) return;
-          if (!payload) return;
-          if (payload.title && get().currentSessionId) {
-            get().updateSessionTitle(get().currentSessionId as string, payload.title);
-          }
-          const currentId = get().currentSessionId;
-          if (currentId) {
-            const lastTime = new Date().toISOString();
-            const existingTitle =
-              get().sessions.find((session) => session.id === currentId)?.title || "新对话";
-            const nextTitle = payload.title || existingTitle;
-            set((state) => ({
-              sessions: upsertSession(state.sessions, {
-                id: currentId,
-                title: nextTitle,
-                lastTime
-              })
-            }));
-          }
-          if (payload.messageId) {
-            set((state) => ({
-              messages: state.messages.map((message) =>
-                message.id === state.streamingMessageId
-                  ? {
-                      ...message,
-                      id: String(payload.messageId),
-                      status: "done",
-                      isThinking: false,
-                      thinkingDuration:
-                        message.thinkingDuration ?? computeThinkingDuration(state.thinkingStartAt)
-                    }
-                  : message
-              )
-            }));
-          } else {
-            set((state) => ({
-              messages: state.messages.map((message) =>
-                message.id === state.streamingMessageId
-                  ? {
-                      ...message,
-                      status: "done",
-                      isThinking: false,
-                      thinkingDuration:
-                        message.thinkingDuration ?? computeThinkingDuration(state.thinkingStartAt)
-                    }
-                  : message
-              )
-            }));
-          }
-        },
-        onCancel: (payload: CompletionPayload) => {
-          if (get().streamingMessageId !== assistantId) return;
-          if (payload?.title && get().currentSessionId) {
-            get().updateSessionTitle(get().currentSessionId as string, payload.title);
-          }
+        }
+        if (payload.messageId) {
           set((state) => ({
-            messages: state.messages.map((message) => {
-              if (message.id !== state.streamingMessageId) return message;
-              const suffix = message.content.includes("Stop Generation")
-                ? ""
-                : "\n\nStop Generation";
-              const nextId = payload?.messageId ? String(payload.messageId) : message.id;
-              return {
-                ...message,
-                id: nextId,
-                content: message.content + suffix,
-                status: "cancelled",
-                isThinking: false,
-                thinkingDuration:
-                  message.thinkingDuration ?? computeThinkingDuration(state.thinkingStartAt)
-              };
-            }),
-            isStreaming: false,
-            thinkingStartAt: null,
-            streamTaskId: null,
-            streamAbort: null,
-            streamingMessageId: null,
-            cancelRequested: false
-          }));
-        },
-        onDone: () => {
-          if (get().streamingMessageId !== assistantId) return;
-          set({
-            isStreaming: false,
-            thinkingStartAt: null,
-            streamTaskId: null,
-            streamAbort: null,
-            streamingMessageId: null,
-            cancelRequested: false
-          });
-        },
-        onTitle: (payload: { title: string }) => {
-          if (get().streamingMessageId !== assistantId) return;
-          if (payload?.title && get().currentSessionId) {
-            get().updateSessionTitle(get().currentSessionId as string, payload.title);
-          }
-        },
-        onError: (error: Error) => {
-          if (get().streamingMessageId !== assistantId) return;
-          set((state) => ({
-            isStreaming: false,
-            thinkingStartAt: null,
-            streamTaskId: null,
-            streamAbort: null,
-            cancelRequested: false,
             messages: state.messages.map((message) =>
               message.id === state.streamingMessageId
                 ? {
                     ...message,
-                    status: "error",
+                    id: String(payload.messageId),
+                    status: "done",
                     isThinking: false,
                     thinkingDuration:
                       message.thinkingDuration ?? computeThinkingDuration(state.thinkingStartAt)
@@ -433,38 +356,119 @@ export const useChatStore = create<ChatState>((set, get) => ({
                 : message
             )
           }));
-          toast.error(error.message || "Failed to generate");
+        } else {
+          set((state) => ({
+            messages: state.messages.map((message) =>
+              message.id === state.streamingMessageId
+                ? {
+                    ...message,
+                    status: "done",
+                    isThinking: false,
+                    thinkingDuration:
+                      message.thinkingDuration ?? computeThinkingDuration(state.thinkingStartAt)
+                  }
+                : message
+            )
+          }));
         }
+      },
+      onCancel: (payload: CompletionPayload) => {
+        if (get().streamingMessageId !== assistantId) return;
+        if (payload?.title && get().currentSessionId) {
+          get().updateSessionTitle(get().currentSessionId as string, payload.title);
+        }
+        set((state) => ({
+          messages: state.messages.map((message) => {
+            if (message.id !== state.streamingMessageId) return message;
+            const suffix = message.content.includes("Stop Generation") ? "" : "\n\nStop Generation";
+            const nextId = payload?.messageId ? String(payload.messageId) : message.id;
+            return {
+              ...message,
+              id: nextId,
+              content: message.content + suffix,
+              status: "cancelled",
+              isThinking: false,
+              thinkingDuration:
+                message.thinkingDuration ?? computeThinkingDuration(state.thinkingStartAt)
+            };
+          }),
+          isStreaming: false,
+          thinkingStartAt: null,
+          streamTaskId: null,
+          streamAbort: null,
+          streamingMessageId: null,
+          cancelRequested: false
+        }));
+      },
+      onDone: () => {
+        if (get().streamingMessageId !== assistantId) return;
+        set({
+          isStreaming: false,
+          thinkingStartAt: null,
+          streamTaskId: null,
+          streamAbort: null,
+          streamingMessageId: null,
+          cancelRequested: false
+        });
+      },
+      onTitle: (payload: { title: string }) => {
+        if (get().streamingMessageId !== assistantId) return;
+        if (payload?.title && get().currentSessionId) {
+          get().updateSessionTitle(get().currentSessionId as string, payload.title);
+        }
+      },
+      onError: (error: Error) => {
+        if (get().streamingMessageId !== assistantId) return;
+        set((state) => ({
+          isStreaming: false,
+          thinkingStartAt: null,
+          streamTaskId: null,
+          streamAbort: null,
+          cancelRequested: false,
+          messages: state.messages.map((message) =>
+            message.id === state.streamingMessageId
+              ? {
+                  ...message,
+                  status: "error",
+                  isThinking: false,
+                  thinkingDuration:
+                    message.thinkingDuration ?? computeThinkingDuration(state.thinkingStartAt)
+                }
+              : message
+          )
+        }));
+        toast.error(error.message || "Failed to generate");
+      }
     };
 
-    const {start, cancel} = createStreamResponse(
-        {
-            url,
-            headers: token ? {Authorization: `Bearer ${token}`} : undefined, 
-            retryCount: 1
-        },
-        handlers 
-    ); 
+    const { start, cancel } = createStreamResponse(
+      {
+        url,
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        retryCount: 1
+      },
+      handlers
+    );
 
-    set({streamAbort: () => cancel}); 
+    set({ streamAbort: () => cancel });
 
     try {
-        await start();  
+      await start();
     } catch (error) {
-        if ((error as Error).name === "AbortError") {
-            return;
-          }
-        handlers.onError?.(error as Error);
+      if ((error as Error).name === "AbortError") {
+        return;
+      }
+      handlers.onError?.(error as Error);
     } finally {
-        if (get().streamingMessageId === assistantId) {
-            set({
-              isStreaming: false,
-              streamTaskId: null,
-              streamAbort: null,
-              streamingMessageId: null,
-              cancelRequested: false
-            });
-        }
+      if (get().streamingMessageId === assistantId) {
+        set({
+          isStreaming: false,
+          streamTaskId: null,
+          streamAbort: null,
+          streamingMessageId: null,
+          cancelRequested: false
+        });
+      }
     }
   },
   cancelGeneration: () => {
