@@ -19,19 +19,22 @@ const DEFAULT_PRESETS: PromptPreset[] = [
   {
     title: "Stuck payments",
     description: "Charged, but the order is still pending",
-    prompt: "The user was charged, but t_trade_payment_order is still WAITING_PAYMENT. Follow the Payment Core flow, point out which hop it is stuck on, and whether to check bankOrderNo or the notification record next.",
+    prompt:
+      "The user was charged, but t_trade_payment_order is still WAITING_PAYMENT. Follow the Payment Core flow, point out which hop it is stuck on, and whether to check bankOrderNo or the notification record next.",
     icon: BookOpen
   },
   {
     title: "Failed notifications",
     description: "Order succeeded, merchant never received it",
-    prompt: "The order is already SUCCESS, but the merchant says they never received the payment result. How do HTTP_REQUEST_SUCCESS and SUCCESS differ, and should a failed notification roll the order back to pending?",
+    prompt:
+      "The order is already SUCCESS, but the merchant says they never received the payment result. How do HTTP_REQUEST_SUCCESS and SUCCESS differ, and should a failed notification roll the order back to pending?",
     icon: Check
   },
   {
     title: "Streaming chat",
     description: "React SSE from meta to finish",
-    prompt: "How is streaming wired on the Q&A page? What do the SSE events meta, message, and finish each do, and which endpoint does stop generation call?",
+    prompt:
+      "How is streaming wired on the Q&A page? What do the SSE events meta, message, and finish each do, and which endpoint does stop generation call?",
     icon: Lightbulb
   }
 ];
@@ -42,8 +45,13 @@ export function WelcomeScreen() {
   const [promptPresets, setPromptPresets] = React.useState<PromptPreset[]>(DEFAULT_PRESETS);
   const isComposingRef = React.useRef(false);
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
-  const { sendMessage, isStreaming, cancelGeneration, deepThinkingEnabled, setDeepThinkingEnabled } =
-    useChatStore();
+  const {
+    sendMessage,
+    isStreaming,
+    cancelGeneration,
+    deepThinkingEnabled,
+    setDeepThinkingEnabled
+  } = useChatStore();
 
   const focusInput = React.useCallback(() => {
     const el = textareaRef.current;
@@ -158,7 +166,8 @@ export function WelcomeScreen() {
             <span className="text-gradient"> clear answers</span>
           </h1>
           <p className="mt-4 text-base text-[#4B5563] sm:text-lg">
-            Structured prompts, knowledge retrieval, and deep thinking — one conversation, an actionable plan
+            Structured prompts, knowledge retrieval, and deep thinking — one conversation, an
+            actionable plan
           </p>
         </div>
 
@@ -169,9 +178,7 @@ export function WelcomeScreen() {
           <div
             className={cn(
               "relative flex flex-col rounded-3xl border border-white/70 bg-white/80 px-5 pt-4 pb-3 shadow-soft backdrop-blur-xl transition-all duration-200",
-              isFocused
-                ? "border-[#BFDBFE] shadow-glow"
-                : "hover:border-[#D4D4D4]"
+              isFocused ? "border-[#BFDBFE] shadow-glow" : "hover:border-[#D4D4D4]"
             )}
           >
             <div className="relative">
@@ -179,7 +186,11 @@ export function WelcomeScreen() {
                 ref={textareaRef}
                 value={value}
                 onChange={(event) => setValue(event.target.value)}
-                placeholder={deepThinkingEnabled ? "Ask something that needs deeper analysis..." : "Ask a question..."}
+                placeholder={
+                  deepThinkingEnabled
+                    ? "Ask something that needs deeper analysis..."
+                    : "Ask a question..."
+                }
                 className="max-h-40 min-h-[52px] w-full resize-none border-0 bg-transparent px-2 pt-2 pb-2 text-[15px] text-[#1F2937] placeholder:text-[#9CA3AF] focus:outline-none sm:text-base"
                 rows={1}
                 onFocus={() => setIsFocused(true)}
@@ -193,7 +204,11 @@ export function WelcomeScreen() {
                 onKeyDown={(event) => {
                   if (event.key === "Enter" && !event.shiftKey) {
                     const nativeEvent = event.nativeEvent as KeyboardEvent;
-                    if (nativeEvent.isComposing || isComposingRef.current || nativeEvent.keyCode === 229) {
+                    if (
+                      nativeEvent.isComposing ||
+                      isComposingRef.current ||
+                      nativeEvent.keyCode === 229
+                    ) {
                       return;
                     }
                     event.preventDefault();
@@ -253,9 +268,7 @@ export function WelcomeScreen() {
             </p>
           ) : null}
           <p className="mt-3 text-center text-xs text-[#94A3B8]">
-            <kbd className="rounded bg-white/80 px-1.5 py-0.5 text-[#6B7280] shadow-sm">
-              Enter
-            </kbd>{" "}
+            <kbd className="rounded bg-white/80 px-1.5 py-0.5 text-[#6B7280] shadow-sm">Enter</kbd>{" "}
             to send
             <span className="px-1.5">·</span>
             <kbd className="rounded bg-white/80 px-1.5 py-0.5 text-[#6B7280] shadow-sm">

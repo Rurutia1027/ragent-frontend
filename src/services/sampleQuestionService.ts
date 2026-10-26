@@ -41,7 +41,10 @@ export async function createSampleQuestion(payload: SampleQuestionPayload): Prom
   return api.post<string, string>("/sample-questions", payload);
 }
 
-export async function updateSampleQuestion(id: string, payload: SampleQuestionPayload): Promise<void> {
+export async function updateSampleQuestion(
+  id: string,
+  payload: SampleQuestionPayload
+): Promise<void> {
   await api.put(`/sample-questions/${id}`, payload);
 }
 

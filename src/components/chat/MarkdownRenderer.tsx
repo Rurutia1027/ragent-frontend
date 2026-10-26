@@ -24,13 +24,13 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
       remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkCjkFriendly]}
       rehypePlugins={[rehypeRaw, rehypeSanitize]}
       components={{
-        code({ inline, className, children, ...props }) {
+        code({ className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || "");
           const language = match?.[1] || "text";
           const value = String(children).replace(/\n$/, "");
+          const isInline = !value.includes("\n");
 
-          // 判断是否为内联代码：inline 为 true 或者没有换行符
-          if (inline || !value.includes('\n')) {
+          if (isInline) {
             return (
               <code
                 className={cn(
@@ -201,7 +201,12 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           );
         },
         hr({ ...props }) {
-          return <hr className="my-6 border-0 border-t border-[#d0d7de] dark:border-[#30363d]" {...props} />;
+          return (
+            <hr
+              className="my-6 border-0 border-t border-[#d0d7de] dark:border-[#30363d]"
+              {...props}
+            />
+          );
         }
       }}
       className="prose prose-gray max-w-none break-words leading-[1.6] dark:prose-invert prose-headings:text-[#1A1A1A] dark:prose-headings:text-[#EEEEEE] prose-p:text-[#333333] dark:prose-p:text-[#CCCCCC] prose-p:leading-relaxed prose-li:text-[#333333] dark:prose-li:text-[#CCCCCC] prose-strong:text-[#1A1A1A] dark:prose-strong:text-[#EEEEEE]"
