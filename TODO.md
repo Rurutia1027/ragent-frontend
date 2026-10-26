@@ -4,23 +4,31 @@ Copy from tag `1.0.0` of `/Users/emma/LLM/ragent`, under `frontend/`. This versi
 
 ## Stage 2 — chat
 
-Already in place: `chatStore`, `sessionService`, `chatService`, `useStreamResponse`, `Loading`, `Header`, plus `textarea`, `alert-dialog`, and `dropdown-menu`. `Sidebar` is only started. `MainLayout` is empty. `/chat` is still a placeholder.
+In place: `chatStore`, `sessionService`, `chatService`, `sampleQuestionService`, `useStreamResponse`, `Loading`, `Toast`, `Header`, `Sidebar`, `MainLayout`, the chat components, `ChatPage`, and `/chat` plus `/chat/:sessionId`. Login and 404 stay. The GitHub star count in `Header` is removed on purpose.
 
-- [ ] Finish `src/components/layout/Sidebar.tsx`
-- [ ] `src/components/layout/MainLayout.tsx`
-- [ ] `src/services/sampleQuestionService.ts`
-- [ ] `src/components/chat/ThinkingIndicator.tsx`
-- [ ] `src/components/chat/QuestionRail.tsx`
-- [ ] `src/components/chat/MarkdownRenderer.tsx`
-- [ ] `src/components/chat/FeedbackButtons.tsx`
-- [ ] `src/components/chat/MessageItem.tsx`
-- [ ] `src/components/chat/WelcomeScreen.tsx`
-- [ ] `src/components/chat/MessageList.tsx`
-- [ ] `src/components/chat/ChatInput.tsx`
-- [ ] `src/pages/ChatPage.tsx`
-- [ ] `src/router.tsx`: render `ChatPage` at `/chat` and `/chat/:sessionId`. Keep login and 404.
+- [x] `src/components/layout/Sidebar.tsx`
+- [x] `src/components/layout/MainLayout.tsx`
+- [x] `src/services/sampleQuestionService.ts`
+- [x] `src/components/chat/ThinkingIndicator.tsx`
+- [x] `src/components/chat/QuestionRail.tsx`
+- [x] `src/components/chat/MarkdownRenderer.tsx`
+- [x] `src/components/chat/FeedbackButtons.tsx`
+- [x] `src/components/chat/MessageItem.tsx`
+- [x] `src/components/chat/WelcomeScreen.tsx`
+- [x] `src/components/chat/MessageList.tsx`
+- [x] `src/components/chat/ChatInput.tsx`
+- [x] `src/pages/ChatPage.tsx`
+- [x] `src/router.tsx`: `ChatPage` at `/chat` and `/chat/:sessionId`
+- [x] `src/components/common/Toast.tsx`, mounted in `App`
 
-Skip for now: `session/`, `Avatar.tsx`, `RelativeTime.tsx`, `useChat.ts`.
+Still wrong or missing:
+
+- [ ] `chatStore` `fetchSessions`: `finally` sets `sessionsLoaded` back to `false`, so an empty sidebar stays on "Loading sessions".
+- [ ] `chatStore` `appendStreamContent`: the id check is inverted (`===` skips the streaming message), so deltas land on the other messages.
+- [ ] `router.tsx`: `/` is still `Placeholder`. The source sends `/` to `/chat` or `/login`, and `/chat` requires a logged-in user.
+- [ ] `ErrorBoundary` around the app, as in the source `App.tsx`.
+
+Skip for now: `session/`, `Avatar.tsx`, `RelativeTime.tsx`, `useChat.ts`. The sidebar "Admin" link waits on stage 3.
 
 ## Stage 3 — admin
 
