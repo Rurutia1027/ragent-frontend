@@ -37,7 +37,7 @@ interface ChatState {
   createSession: () => Promise<string>;
   deleteSession: (sessionId: string) => Promise<void>;
   renameSession: (sessionId: string, title: string) => Promise<void>;
-  selectSession: (sessionId: string) => void;
+  selectSession: (sessionId: string) => Promise<void>;
   updateSessionTitle: (sessionId: string, title: string) => void;
   setDeepThinkingEnabled: (enabled: boolean) => void;
   sendMessage: (content: string) => Promise<void>;
