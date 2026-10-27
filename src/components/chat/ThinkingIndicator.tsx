@@ -13,7 +13,7 @@ export function ThinkingIndicator({ content, duration }: ThinkingIndicatorProps)
         <span className="text-sm font-medium">Deep thinking...</span>
         {duration ? (
           <span className="text-xs text-[#2563EB] bg-[#BFDBFE] px-2 py-0.5 rounded-full">
-            {duration}秒
+            {duration} sec
           </span>
         ) : null}
       </div>

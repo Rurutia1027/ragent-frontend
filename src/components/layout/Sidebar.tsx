@@ -75,7 +75,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     const keyword = query.trim().toLowerCase();
     if (!keyword) return sessions;
     return sessions.filter((session) => {
-      const title = (session.title || "新对话").toLowerCase();
+      const title = (session.title || "New chat").toLowerCase();
       return title.includes(keyword) || session.id.toLowerCase().includes(keyword);
     });
   }, [query, sessions]);
@@ -89,10 +89,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       const parsed = value ? new Date(value) : now;
       const date = isValid(parsed) ? parsed : now;
       const diff = Math.max(0, differenceInCalendarDays(now, date));
-      if (diff === 0) return "今天";
-      if (diff <= 7) return "7天内";
-      if (diff <= 30) return "30天内";
-      return "更早";
+      if (diff === 0) return "Today";
+      if (diff <= 7) return "Previous 7 days";
+      if (diff <= 30) return "Previous 30 days";
+      return "Older";
     };
 
     filteredSessions.forEach((session) => {
@@ -123,13 +123,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const avatarUrl = user?.avatar?.trim();
   const showAvatar = Boolean(avatarUrl) && !avatarFailed;
-  const avatarFallback = (user?.username || user?.userId || "用户").slice(0, 1).toUpperCase();
+  const avatarFallback = (user?.username || user?.userId || "User").slice(0, 1).toUpperCase();
   const sessionTitleFont =
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif';
 
   const startRename = (id: string, title: string) => {
     setRenamingId(id);
-    setRenameValue(title || "新对话");
+    setRenameValue(title || "New chat");
   };
 
   const cancelRename = () => {
@@ -144,7 +144,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       cancelRename();
       return;
     }
-    const currentTitle = sessions.find((session) => session.id === renamingId)?.title || "新对话";
+    const currentTitle = sessions.find((session) => session.id === renamingId)?.title || "New chat";
     if (nextTitle === currentTitle) {
       cancelRename();
       return;
@@ -174,7 +174,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <Bot className="h-5 w-5 text-white" />
             </div>
             <div style={{ fontFamily: sessionTitleFont }}>
-              <p className="text-base font-semibold text-[#1A1A1A]">Ragent AI 智能体</p>
+              <p className="text-base font-semibold text-[#1A1A1A]">Ragent AI</p>
               <p className="text-xs text-[#999999]">Powered by AI</p>
             </div>
           </div>
@@ -191,9 +191,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             />
             <div className="relative">
               <div className="flex items-center justify-between px-1">
-                <span className="text-[11px] font-semibold text-[#94A3B8]">快速开始</span>
+                <span className="text-[11px] font-semibold text-[#94A3B8]">Quick start</span>
                 <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-semibold text-[#2563EB]">
-                  新内容
+                  New
                 </span>
               </div>
               <button
@@ -209,8 +209,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <Plus className="h-4 w-4" />
                 </span>
                 <span className="flex-1">
-                  <span className="block text-sm font-semibold text-[#1F2937]">新建对话</span>
-                  <span className="block text-xs text-[#94A3B8]">从空白开始</span>
+                  <span className="block text-sm font-semibold text-[#1F2937]">New chat</span>
+                  <span className="block text-xs text-[#94A3B8]">Start blank</span>
                 </span>
               </button>
               {user?.role === "admin" ? (
@@ -223,14 +223,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   }}
                 >
                   <Settings className="h-3.5 w-3.5" />
-                  管理后台
+                  Admin
                 </button>
               ) : null}
             </div>
           </div>
           <div className="rounded-2xl border border-[#E6EEF6] bg-white p-3 shadow-[0_12px_26px_rgba(15,23,42,0.06)]">
             <div className="flex items-center justify-between px-1">
-              <span className="text-[11px] font-semibold text-[#94A3B8]">搜索对话</span>
+              <span className="text-[11px] font-semibold text-[#94A3B8]">Search chats</span>
               <span className="text-[10px] text-[#CBD5F5]">Ctrl / Cmd + K</span>
             </div>
             <div className="mt-2">
@@ -239,7 +239,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <input
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="搜索对话..."
+                  placeholder="Search chats..."
                   className="h-10 w-full rounded-xl border border-[#E5E7EB] bg-[#F8FAFC] pl-9 pr-3 text-sm text-[#1F2937] placeholder:text-[#9CA3AF] transition-colors focus:border-[#93C5FD] focus:outline-none"
                 />
               </div>
@@ -253,7 +253,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 className="flex h-full items-center justify-center text-[#999999]"
                 style={{ fontFamily: sessionTitleFont }}
               >
-                <Loading label="加载会话中" />
+                <Loading label="Loading sessions" />
               </div>
             ) : filteredSessions.length === 0 ? (
               <div
@@ -261,7 +261,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 style={{ fontFamily: sessionTitleFont }}
               >
                 <MessageSquare className="h-16 w-16" />
-                <p className="mt-2 text-[14px]">暂无对话记录</p>
+                <p className="mt-2 text-[14px]">No chats yet</p>
               </div>
             ) : (
               <div>
@@ -324,7 +324,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           />
                         ) : (
                           <span className="min-w-0 flex-1 truncate font-normal">
-                            {session.title || "新对话"}
+                            {session.title || "New chat"}
                           </span>
                         )}
                         <DropdownMenu>
@@ -338,7 +338,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                                   : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100"
                               )}
                               onClick={(event) => event.stopPropagation()}
-                              aria-label="会话操作"
+                              aria-label="Chat actions"
                             >
                               <MoreHorizontal className="h-4 w-4" />
                             </button>
@@ -350,25 +350,25 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <DropdownMenuItem
                               onClick={(event) => {
                                 event.stopPropagation();
-                                startRename(session.id, session.title || "新对话");
+                                startRename(session.id, session.title || "New chat");
                               }}
                               className="px-4 py-2 text-[14px] text-[#333333] focus:bg-[#F5F5F5] focus:text-[#333333] data-[highlighted]:bg-[#F5F5F5] data-[highlighted]:text-[#333333]"
                             >
                               <Pencil className="mr-2 h-4 w-4" />
-                              重命名
+                              Rename
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={(event) => {
                                 event.stopPropagation();
                                 setDeleteTarget({
                                   id: session.id,
-                                  title: session.title || "新对话"
+                                  title: session.title || "New chat"
                                 });
                               }}
                               className="px-4 py-2 text-[14px] text-[#FF4D4F] focus:bg-[#F5F5F5] focus:text-[#FF4D4F] data-[highlighted]:bg-[#F5F5F5] data-[highlighted]:text-[#FF4D4F]"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
-                              删除
+                              Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -390,13 +390,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <button
                 type="button"
                 className="flex w-full items-center gap-2 rounded-lg p-2 text-left transition-colors hover:bg-[#F5F5F5] data-[state=open]:bg-[#EEEEEE]"
-                aria-label="用户菜单"
+                aria-label="User Menu"
               >
                 <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[#3B82F6] text-white">
                   {showAvatar ? (
                     <img
                       src={avatarUrl}
-                      alt={user?.username || user?.userId || "用户"}
+                      alt={user?.username || user?.userId || "User"}
                       className="h-full w-full object-cover"
                       onError={() => setAvatarFailed(true)}
                     />
@@ -406,8 +406,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
                 <span className="flex-1 truncate text-sm font-medium text-[#1A1A1A]">
                   {(() => {
-                    const fallback = user?.username || user?.userId || "用户";
-                    return /^\d+$/.test(fallback) ? "用户" : fallback;
+                    const fallback = user?.username || user?.userId || "User";
+                    return /^\d+$/.test(fallback) ? "User" : fallback;
                   })()}
                 </span>
                 <MoreHorizontal className="h-4 w-4 text-[#999999]" />
@@ -422,7 +422,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className="flex items-center"
                 >
                   <BookOpen className="mr-2 h-4 w-4" />
-                  官方文档
+                  Docs
                 </a>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
@@ -433,7 +433,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   className="flex items-center"
                 >
                   <PlayCircle className="mr-2 h-4 w-4" />
-                  哔哩哔哩
+                  Bilibili
                 </a>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -441,7 +441,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 className="text-rose-600 focus:text-rose-600"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                退出登录
+                Log out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -457,13 +457,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>删除该会话？</AlertDialogTitle>
+            <AlertDialogTitle>Delete this chat?</AlertDialogTitle>
             <AlertDialogDescription>
-              [{deleteTarget?.title || "该会话"}] 将被永久删除，无法恢复。
+              [{deleteTarget?.title || "This chat"}] will be permanently deleted. This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (!deleteTarget) return;
@@ -479,7 +479,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   .catch(() => null);
               }}
             >
-              删除
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -65,9 +65,9 @@ export function FeedbackButtons({
     markInteracted();
     try {
       await navigator.clipboard.writeText(content);
-      toast.success("复制成功");
+      toast.success("Copied");
     } catch {
-      toast.error("复制失败");
+      toast.error("Copy failed");
     }
   };
 
@@ -87,7 +87,7 @@ export function FeedbackButtons({
         variant="ghost"
         size="icon"
         onClick={handleCopy}
-        aria-label="复制内容"
+        aria-label="Copy"
         className="h-8 w-8 text-[#999999] hover:bg-[#F5F5F5] hover:text-[#666666]"
       >
         <Copy className="h-4 w-4" />
@@ -96,7 +96,7 @@ export function FeedbackButtons({
         variant="ghost"
         size="icon"
         onClick={() => handleFeedback("like")}
-        aria-label="点赞"
+        aria-label="Like"
         className={cn(
           "h-8 w-8 text-[#999999] hover:text-[#10B981] hover:bg-[#F5F5F5]",
           feedback === "like" && "text-[#10B981]"
@@ -108,7 +108,7 @@ export function FeedbackButtons({
         variant="ghost"
         size="icon"
         onClick={() => handleFeedback("dislike")}
-        aria-label="点踩"
+        aria-label="Dislike"
         className={cn(
           "h-8 w-8 text-[#999999] hover:text-[#EF4444] hover:bg-[#F5F5F5]",
           feedback === "dislike" && "text-[#EF4444]"

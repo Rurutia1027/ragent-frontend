@@ -268,7 +268,7 @@ function CopyButton({ value }: { value: string }) {
       variant="ghost"
       size="icon"
       onClick={handleCopy}
-      aria-label="复制代码"
+      aria-label="Copy code"
       className="h-7 w-7 hover:bg-[#eaeef2] dark:hover:bg-[#30363d] transition-colors"
     >
       {copied ? (
