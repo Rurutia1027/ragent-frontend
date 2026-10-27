@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 
 import { Placeholder } from "@/components/Placeholder";
 import { LoginPage } from "@/pages/LoginPage";
+import { ChatPage } from "@/pages/ChatPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 
 export const router = createBrowserRouter([
@@ -15,7 +16,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/chat",
-    element: <Placeholder title="Chat" path="/chat" />
+    element: <ChatPage />
+  },
+  {
+    path: "/chat/:sessionId",
+    element: <ChatPage />
   },
   {
     path: "*",

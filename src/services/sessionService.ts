@@ -17,9 +17,8 @@ export interface ConversationMessageVO {
   createTime?: string;
 }
 
-export async function listSessions(): Promise<ConversationVO[]> {
-  const data = await api.get("/conversations");
-  return data as unknown as ConversationVO[];
+export async function listSessions() {
+  return api.get<ConversationVO[], ConversationVO[]>("/conversations");
 }
 
 export async function deleteSession(conversationId: string) {
@@ -30,7 +29,8 @@ export async function renameSession(conversationId: string, title: string) {
   return api.put<void>(`/conversations/${conversationId}`, { title });
 }
 
-export async function listMessages(conversationId: string): Promise<ConversationMessageVO[]> {
-  const data = await api.get(`/conversations/${conversationId}/messages`);
-  return data as unknown as ConversationMessageVO[];
+export async function listMessages(conversationId: string) {
+  return api.get<ConversationMessageVO[], ConversationMessageVO[]>(
+    `/conversations/${conversationId}/messages`
+  );
 }
