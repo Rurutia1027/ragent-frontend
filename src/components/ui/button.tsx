@@ -50,6 +50,5 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = "Button";
-// alert-dialog uses buttonVariants for its action and cancel buttons.
 // eslint-disable-next-line react-refresh/only-export-components
 export { Button, buttonVariants };

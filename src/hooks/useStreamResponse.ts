@@ -145,7 +145,7 @@ async function streamWithRetry(options: StreamOptions, handlers: StreamHandlers)
       });
 
       if (!response.ok) {
-        throw new Error(`SSE 请求失败（${response.status}）`);
+        throw new Error(`SSE request failed (${response.status})`);
       }
 
       await readSseStream(response, handlers, signal);

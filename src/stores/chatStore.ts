@@ -37,7 +37,7 @@ interface ChatState {
   createSession: () => Promise<string>;
   deleteSession: (sessionId: string) => Promise<void>;
   renameSession: (sessionId: string, title: string) => Promise<void>;
-  selectSession: (sessionId: string) => void;
+  selectSession: (sessionId: string) => Promise<void>;
   updateSessionTitle: (sessionId: string, title: string) => void;
   setDeepThinkingEnabled: (enabled: boolean) => void;
   sendMessage: (content: string) => Promise<void>;
@@ -299,7 +299,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
           streamTaskId: payload.taskId,
           sessions: upsertSession(state.sessions, {
             id: nextId,
-            title: existing?.title || "新对话",
+            title: existing?.title || "New chat",
             lastTime
           })
         }));
@@ -331,7 +331,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         if (currentId) {
           const lastTime = new Date().toISOString();
           const existingTitle =
-            get().sessions.find((session) => session.id === currentId)?.title || "新对话";
+            get().sessions.find((session) => session.id === currentId)?.title || "New chat";
           const nextTitle = payload.title || existingTitle;
           set((state) => ({
             sessions: upsertSession(state.sessions, {
