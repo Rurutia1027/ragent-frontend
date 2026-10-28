@@ -1,6 +1,6 @@
 import { api } from "@/services/api";
 
-export type DashboardResponse = {
+export type DashboardKpi = {
   value: number;
   delta?: number;
   deltaPct?: number;
