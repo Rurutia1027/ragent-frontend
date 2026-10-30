@@ -17,9 +17,7 @@ export function RelativeTime({ value, updatedBy }: RelativeTimeProps) {
     <TooltipProvider delayDuration={300}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="cursor-default truncate text-sm tabular-nums">
-            {display}
-          </span>
+          <span className="cursor-default truncate text-sm tabular-nums">{display}</span>
         </TooltipTrigger>
         <TooltipContent>
           <p>{formatTooltipTime(value)}</p>
