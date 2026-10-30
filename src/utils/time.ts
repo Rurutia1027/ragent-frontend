@@ -17,9 +17,9 @@ const formatRelativeNumeric = (value: string) => {
   const diffHours = differenceInHours(new Date(), date);
   const diffDays = differenceInDays(new Date(), date);
   if (diffMinutes < 1) return "Just now";
-  if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
-  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
-  return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+  if (diffMinutes < 60) return `${diffMinutes} min ago`;
+  if (diffHours < 24) return `${diffHours} hr ago`;
+  return `${diffDays} days ago`;
 };
 
 export const formatRelativeTime = (value?: string | null) => {
@@ -30,13 +30,13 @@ export const formatRelativeTime = (value?: string | null) => {
   const diffMinutes = differenceInMinutes(now, date);
   const diffHours = differenceInHours(now, date);
   if (diffMinutes < 1) return "Just now";
-  if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
+  if (diffMinutes < 60) return `${diffMinutes} min ago`;
   if (
     date.getDate() === now.getDate() &&
     date.getMonth() === now.getMonth() &&
     date.getFullYear() === now.getFullYear()
   ) {
-    return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+    return `${diffHours} hr ago`;
   }
   const yesterday = new Date(now);
   yesterday.setDate(yesterday.getDate() - 1);

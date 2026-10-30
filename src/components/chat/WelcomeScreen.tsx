@@ -1,77 +1,84 @@
-import * as React from "react"; 
-import { ArrowUpRight, BookOpen, Bot, Brain, Check, Lightbulb, Send, Square} from 'lucide-react'; 
-import { cn} from "@/lib/utils"; 
-import { listSampleQuestions} from "@/services/sampleQuestionService"; 
-import { useChatStore } from "@/stores/chatStore";  
+import * as React from "react";
+import { ArrowUpRight, BookOpen, Bot, Brain, Check, Lightbulb, Send, Square } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { listSampleQuestions } from "@/services/sampleQuestionService";
+import { useChatStore } from "@/stores/chatStore";
 
 type PromptPreset = {
-  id?: string; 
-  title: string; 
-  description: string; 
-  prompt: string; 
-  icon: React.ComponentType<{className?: string}>; 
-}; 
+  id?: string;
+  title: string;
+  description: string;
+  prompt: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
 
-const PRESET_ICONS = [BookOpen, Check, Lightbulb]; 
+const PRESET_ICONS = [BookOpen, Check, Lightbulb];
 
 const DEFAULT_PRESETS: PromptPreset[] = [
   {
-    title: "Stuck payment",
-    description: "The user was charged, but the order is still waiting for payment",
-    prompt: "The user has already been charged, but t_trade_payment_order is still WAITING_PAYMENT. Follow the Payment Core path, say which hop it is stuck on, and whether the next check should be bankOrderNo or the notification record.",
+    title: "Stuck payments",
+    description: "Charged, but the order is still pending",
+    prompt:
+      "The user was charged, but t_trade_payment_order is still WAITING_PAYMENT. Follow the Payment Core flow, point out which hop it is stuck on, and whether to check bankOrderNo or the notification record next.",
     icon: BookOpen
   },
   {
-    title: "Notification failed",
-    description: "The order succeeded, but the merchant says they never received it",
-    prompt: "The order is already SUCCESS, but the merchant says they did not receive the payment result. How do HTTP_REQUEST_SUCCESS and SUCCESS differ, and if notification fails, should the order be moved back to waiting for payment?",
+    title: "Failed notifications",
+    description: "Order succeeded, merchant never received it",
+    prompt:
+      "The order is already SUCCESS, but the merchant says they never received the payment result. How do HTTP_REQUEST_SUCCESS and SUCCESS differ, and should a failed notification roll the order back to pending?",
     icon: Check
   },
   {
     title: "Streaming chat",
-    description: "SSE on the React side, from meta to finish",
-    prompt: "How does streaming output on the chat page connect? What do the SSE events meta, message, and finish each do, and which endpoint does stop generation call?",
+    description: "React SSE from meta to finish",
+    prompt:
+      "How is streaming wired on the Q&A page? What do the SSE events meta, message, and finish each do, and which endpoint does stop generation call?",
     icon: Lightbulb
   }
-]; 
-
+];
 
 export function WelcomeScreen() {
-  const [value, setValue] = React.useState(""); 
-  const [isFocused, setIsFocused] = React.useState(false);  
-  const [promptPresets, setPromptPresets] = React.useState<PromptPreset[]>(DEFAULT_PRESETS);  
-  const isComposingRef = React.useRef(false); 
-  const textareaRef = React.useRef<HTMLTextAreaElement | null>(null); 
-  const { sendMessage, isStreaming, cancelGeneration, deepThinkingEnabled, setDeepThinkingEnabled } =
-  useChatStore();
+  const [value, setValue] = React.useState("");
+  const [isFocused, setIsFocused] = React.useState(false);
+  const [promptPresets, setPromptPresets] = React.useState<PromptPreset[]>(DEFAULT_PRESETS);
+  const isComposingRef = React.useRef(false);
+  const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const {
+    sendMessage,
+    isStreaming,
+    cancelGeneration,
+    deepThinkingEnabled,
+    setDeepThinkingEnabled
+  } = useChatStore();
 
   const focusInput = React.useCallback(() => {
-    const el = textareaRef.current; 
-    if (!el) return; 
-    el.focus({preventScroll: true});     
-  }, []); 
+    const el = textareaRef.current;
+    if (!el) return;
+    el.focus({ preventScroll: true });
+  }, []);
 
   const adjustHeight = React.useCallback(() => {
-    const el = textareaRef.current; 
-    if (!el) return; 
-    el.style.height = "auto"; 
-    const next = Math.min(el.scrollHeight, 160); 
-    el.style.height = `${next}px`; 
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    const next = Math.min(el.scrollHeight, 160);
+    el.style.height = `${next}px`;
   }, []);
-  
-  React.useEffect(() => {
-    adjustHeight(); 
-  }, [value, adjustHeight]); 
 
   React.useEffect(() => {
-    let active = true; 
+    adjustHeight();
+  }, [value, adjustHeight]);
+
+  React.useEffect(() => {
+    let active = true;
 
     const loadPresets = async () => {
-      const data = await listSampleQuestions().catch(() => null); 
+      const data = await listSampleQuestions().catch(() => null);
       if (!active || !data || data.length === 0) {
         return;
       }
-
       const mapped = data
         .filter((item) => item.question && item.question.trim())
         .slice(0, 3)
@@ -80,7 +87,7 @@ export function WelcomeScreen() {
           const title =
             item.title?.trim() ||
             (question.length > 12 ? `${question.slice(0, 12)}...` : question) ||
-            `Question ${index + 1}`;
+            `Suggested prompt ${index + 1}`;
           const description = item.description?.trim() || "Click to start the conversation";
           return {
             id: item.id,
@@ -100,34 +107,31 @@ export function WelcomeScreen() {
       active = false;
     };
   }, []);
-  
+
   const applyPreset = React.useCallback(
     (prompt: string) => {
-      if (isStreaming) {
-        return; 
-      }
-      setValue(prompt); 
-      focusInput(); 
-    }, 
-    [isStreaming, focusInput] 
-  ); 
+      if (isStreaming) return;
+      setValue(prompt);
+      focusInput();
+    },
+    [isStreaming, focusInput]
+  );
 
   const handleSubmit = async () => {
     if (isStreaming) {
-      cancelGeneration(); 
-      focusInput(); 
-      return; 
+      cancelGeneration();
+      focusInput();
+      return;
     }
+    if (!value.trim()) return;
+    const next = value;
+    setValue("");
+    focusInput();
+    await sendMessage(next);
+    focusInput();
+  };
 
-    if (!value.trim()) return; 
-    const next = value; 
-    setValue(""); 
-    focusInput(); 
-    await sendMessage(next); 
-    focusInput(); 
-  }; 
-
-  const hasContent = value.trim().length > 0;  
+  const hasContent = value.trim().length > 0;
 
   return (
     <div className="relative flex min-h-full items-center justify-center overflow-hidden px-4 py-16 sm:px-6">
@@ -155,14 +159,15 @@ export function WelcomeScreen() {
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/70 px-3 py-1 text-xs font-medium text-[#2563EB] shadow-sm">
             <Bot className="h-3.5 w-3.5" />
-            RAG assistant
+            RAG Q&A
           </span>
           <h1 className="mt-4 font-display text-4xl leading-tight tracking-tight text-[#111827] sm:text-5xl md:text-6xl">
-            Turn a question into
-            <span className="text-gradient"> a clear answer</span>
+            Turn questions into
+            <span className="text-gradient"> clear answers</span>
           </h1>
           <p className="mt-4 text-base text-[#4B5563] sm:text-lg">
-            Structured questions, knowledge retrieval, and deep thinking. One conversation, a concrete next step.
+            Structured prompts, knowledge retrieval, and deep thinking — one conversation, an
+            actionable plan
           </p>
         </div>
 
@@ -173,9 +178,7 @@ export function WelcomeScreen() {
           <div
             className={cn(
               "relative flex flex-col rounded-3xl border border-white/70 bg-white/80 px-5 pt-4 pb-3 shadow-soft backdrop-blur-xl transition-all duration-200",
-              isFocused
-                ? "border-[#BFDBFE] shadow-glow"
-                : "hover:border-[#D4D4D4]"
+              isFocused ? "border-[#BFDBFE] shadow-glow" : "hover:border-[#D4D4D4]"
             )}
           >
             <div className="relative">
@@ -183,7 +186,11 @@ export function WelcomeScreen() {
                 ref={textareaRef}
                 value={value}
                 onChange={(event) => setValue(event.target.value)}
-                placeholder={deepThinkingEnabled ? "Ask a question that needs deeper analysis..." : "Ask a question..."}
+                placeholder={
+                  deepThinkingEnabled
+                    ? "Ask something that needs deeper analysis..."
+                    : "Ask a question..."
+                }
                 className="max-h-40 min-h-[52px] w-full resize-none border-0 bg-transparent px-2 pt-2 pb-2 text-[15px] text-[#1F2937] placeholder:text-[#9CA3AF] focus:outline-none sm:text-base"
                 rows={1}
                 onFocus={() => setIsFocused(true)}
@@ -197,7 +204,11 @@ export function WelcomeScreen() {
                 onKeyDown={(event) => {
                   if (event.key === "Enter" && !event.shiftKey) {
                     const nativeEvent = event.nativeEvent as KeyboardEvent;
-                    if (nativeEvent.isComposing || isComposingRef.current || nativeEvent.keyCode === 229) {
+                    if (
+                      nativeEvent.isComposing ||
+                      isComposingRef.current ||
+                      nativeEvent.keyCode === 229
+                    ) {
                       return;
                     }
                     event.preventDefault();
@@ -252,14 +263,12 @@ export function WelcomeScreen() {
             <p className="mt-3 text-xs text-[#2563EB]">
               <span className="inline-flex items-center gap-1.5">
                 <Lightbulb className="h-3.5 w-3.5" />
-                Deep thinking is on. The model will reason more thoroughly.
+                Deep thinking is on. The model will reason through this in more depth.
               </span>
             </p>
           ) : null}
           <p className="mt-3 text-center text-xs text-[#94A3B8]">
-            <kbd className="rounded bg-white/80 px-1.5 py-0.5 text-[#6B7280] shadow-sm">
-              Enter
-            </kbd>{" "}
+            <kbd className="rounded bg-white/80 px-1.5 py-0.5 text-[#6B7280] shadow-sm">Enter</kbd>{" "}
             to send
             <span className="px-1.5">·</span>
             <kbd className="rounded bg-white/80 px-1.5 py-0.5 text-[#6B7280] shadow-sm">
@@ -276,7 +285,7 @@ export function WelcomeScreen() {
         >
           <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-[0.24em] text-[#94A3B8]">
             <span className="h-px w-8 bg-[#E5E7EB]" />
-            Try one of these
+            Try these starters
             <span className="h-px w-8 bg-[#E5E7EB]" />
           </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -303,7 +312,7 @@ export function WelcomeScreen() {
                     </div>
                   </div>
                   <div className="mt-3 flex items-center gap-2 text-xs text-[#94A3B8]">
-                    <span className="min-w-0 flex-1 truncate">Suggested prompt: {preset.prompt}</span>
+                    <span className="min-w-0 flex-1 truncate">Suggested: {preset.prompt}</span>
                     <ArrowUpRight className="h-3.5 w-3.5 text-[#CBD5F5] transition-colors group-hover:text-[#3B82F6]" />
                   </div>
                 </button>

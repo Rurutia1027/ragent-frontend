@@ -74,7 +74,9 @@ export function ChatInput() {
             value={value}
             onChange={(event) => setValue(event.target.value)}
             placeholder={
-              deepThinkingEnabled ? "Ask a question that needs deeper analysis..." : "Ask a question..."
+              deepThinkingEnabled
+                ? "Ask a question that needs a deeper analysis..."
+                : "Ask a question..."
             }
             className="max-h-40 min-h-[44px] w-full resize-none border-0 bg-transparent px-2 pt-2 pb-2 pr-2 text-[15px] text-[#333333] shadow-none placeholder:text-[#999999] focus-visible:ring-0"
             rows={1}
@@ -89,7 +91,11 @@ export function ChatInput() {
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 const nativeEvent = event.nativeEvent as KeyboardEvent;
-                if (nativeEvent.isComposing || isComposingRef.current || nativeEvent.keyCode === 229) {
+                if (
+                  nativeEvent.isComposing ||
+                  isComposingRef.current ||
+                  nativeEvent.keyCode === 229
+                ) {
                   return;
                 }
                 event.preventDefault();
@@ -144,15 +150,15 @@ export function ChatInput() {
         <p className="text-xs text-[#2563EB]">
           <span className="inline-flex items-center gap-1.5">
             <Lightbulb className="h-3.5 w-3.5" />
-            Deep thinking is on. The model will reason more thoroughly.
+            Deep thinking is on. The model will reason through the question in more detail.
           </span>
         </p>
       ) : null}
       <p className="text-center text-xs text-[#999999]">
         <kbd className="rounded bg-[#F5F5F5] px-1.5 py-0.5 text-[#666666]">Enter</kbd> to send
         <span className="px-1.5">·</span>
-        <kbd className="rounded bg-[#F5F5F5] px-1.5 py-0.5 text-[#666666]">Shift + Enter</kbd> for a new
-        line
+        <kbd className="rounded bg-[#F5F5F5] px-1.5 py-0.5 text-[#666666]">Shift + Enter</kbd> for a
+        new line
         {isStreaming ? <span className="ml-2 animate-pulse-soft">Generating...</span> : null}
       </p>
     </div>

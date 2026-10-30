@@ -3,7 +3,7 @@ import { format } from "date-fns";
 export function formatTimestamp(value?: string) {
   if (!value) return "";
   try {
-    return format(new Date(value), "MMM d, HH:mm");
+    return format(new Date(value), "MMM dd HH:mm");
   } catch {
     return "";
   }

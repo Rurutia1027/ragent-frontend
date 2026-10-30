@@ -4,6 +4,7 @@ import { Placeholder } from "@/components/Placeholder";
 import { ChatPage } from "@/pages/ChatPage";
 import { WelcomeIconPreview } from "@/pages/dev/WelcomeIconPreview";
 import { LoginPage } from "@/pages/LoginPage";
+import { ChatPage } from "@/pages/ChatPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 
 export const router = createBrowserRouter([
@@ -17,6 +18,10 @@ export const router = createBrowserRouter([
   },
   {
     path: "/chat",
+    element: <ChatPage />
+  },
+  {
+    path: "/chat/:sessionId",
     element: <ChatPage />
   },
   {

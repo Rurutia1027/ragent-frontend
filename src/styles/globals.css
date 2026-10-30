@@ -27,46 +27,46 @@
   --chat-assistant: 0 0% 100%;
   --glow: 239 84% 67%;
 
-  /* ===== Design tokens - background ===== */
+  /* ===== Design system - background ===== */
   --bg-primary: #ffffff;
   --bg-secondary: #fafafa;
   --bg-tertiary: #f5f5f5;
   --bg-hover: #eeeeee;
   --bg-active: #fef3c7;
 
-  /* ===== Design tokens - text ===== */
+  /* ===== Design system - text ===== */
   --text-primary: #1a1a1a;
   --text-secondary: #4a4a4a;
   --text-tertiary: #999999;
   --text-muted: #cccccc;
   --text-on-accent: #ffffff;
 
-  /* ===== Design tokens - accent (blue) ===== */
+  /* ===== Design system - accent (blue) ===== */
   --accent-primary: #3b82f6;
   --accent-secondary: #2563eb;
   --accent-light: #dbeafe;
   --accent-hover: #60a5fa;
 
-  /* ===== Design tokens - border ===== */
+  /* ===== Design system - border ===== */
   --border-default: #e5e5e5;
   --border-light: #f0f0f0;
   --border-focus: #d4d4d4;
   --border-accent: #bfdbfe;
 
-  /* ===== Design tokens - status ===== */
+  /* ===== Design system - status ===== */
   --success: #10b981;
   --warning: #f59e0b;
   --error: #ef4444;
   --info: #3b82f6;
 
-  /* ===== Design tokens - radius ===== */
+  /* ===== Design system - radius ===== */
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
   --radius-full: 9999px;
 
-  /* ===== Design tokens - spacing ===== */
+  /* ===== Design system - spacing ===== */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 12px;
@@ -76,20 +76,20 @@
   --spacing-3xl: 48px;
   --spacing-4xl: 64px;
 
-  /* ===== Design tokens - shadow ===== */
+  /* ===== Design system - shadow ===== */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 6px 16px rgba(0, 0, 0, 0.08);
   --shadow-xl: 0 10px 24px rgba(0, 0, 0, 0.1);
 
-  /* ===== Design tokens - font family ===== */
+  /* ===== Design system - font ===== */
   --font-sans:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-serif: Georgia, "Times New Roman", serif;
   --font-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
 
-  /* ===== Design tokens - font size ===== */
+  /* ===== Design system - font size ===== */
   --text-xs: 12px;
   --text-sm: 13px;
   --text-base: 14px;
@@ -99,28 +99,28 @@
   --text-3xl: 32px;
   --text-4xl: 48px;
 
-  /* ===== Design tokens - font weight ===== */
+  /* ===== Design system - font weight ===== */
   --font-normal: 400;
   --font-medium: 500;
   --font-semibold: 600;
   --font-bold: 700;
 
-  /* ===== Design tokens - line height ===== */
+  /* ===== Design system - line height ===== */
   --leading-tight: 1.25;
   --leading-normal: 1.5;
   --leading-relaxed: 1.75;
 
-  /* ===== Design tokens - transition ===== */
+  /* ===== Design system - transition ===== */
   --transition-fast: 150ms ease;
   --transition-base: 200ms ease;
   --transition-slow: 300ms ease;
 
-  /* ===== Design tokens - layout ===== */
+  /* ===== Design system - layout ===== */
   --sidebar-width: 280px;
   --content-max-width: 840px;
   --header-height: 60px;
 
-  /* ===== Legacy variables kept for compatibility ===== */
+  /* ===== Legacy variables (compatibility) ===== */
   --sidebar-bg: #fafafa;
   --sidebar-item-active: #dbeafe;
   --sidebar-item-hover: #f5f5f5;
@@ -154,7 +154,7 @@ body {
   overflow: hidden;
 }
 
-/* Show the focus ring for keyboard navigation only, not after a mouse click */
+/* Show the focus ring for keyboard navigation only */
 button:focus:not(:focus-visible),
 select:focus:not(:focus-visible),
 [role="switch"]:focus:not(:focus-visible) {

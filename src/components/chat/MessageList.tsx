@@ -60,9 +60,12 @@ export function MessageList({ messages, isLoading, isStreaming, sessionKey }: Me
     });
   }, []);
 
-  const handleRangeChanged = React.useCallback((range: { startIndex: number; endIndex: number }) => {
-    setVisibleEnd(range.endIndex);
-  }, []);
+  const handleRangeChanged = React.useCallback(
+    (range: { startIndex: number; endIndex: number }) => {
+      setVisibleEnd(range.endIndex);
+    },
+    []
+  );
 
   const scrollToBottom = React.useCallback(() => {
     virtuosoRef.current?.scrollToIndex({ index: "LAST", align: "end", behavior: "auto" });
@@ -196,20 +199,23 @@ export function MessageList({ messages, isLoading, isStreaming, sessionKey }: Me
     });
   }, [isStreaming, isLoading, scrollToBottom, stickToBottom]);
 
-  // Triple-click would otherwise select across the next message.
-  // Stop that selection, then select only the clicked block.
-  const handleTripleClickDown = React.useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    if (event.detail < 3) return;
-    event.preventDefault();
-    const target = event.target as HTMLElement;
+  // Intercept triple-click at mousedown phase to prevent browser from
+  // extending paragraph selection across sibling message boundaries.
+  // preventDefault() stops the default selection, then we manually select
+  // only the clicked block-level element's contents.
+  const handleTripleClickDown = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.detail < 3) return;
+    e.preventDefault();
+    const target = e.target as HTMLElement;
     const block = target.closest("p, li, h1, h2, h3, h4, h5, h6, pre, blockquote, td, th");
-    const container = block && event.currentTarget.contains(block) ? block : event.currentTarget;
-    const selection = window.getSelection();
-    if (!selection) return;
-    const range = document.createRange();
-    range.selectNodeContents(container);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    const container = block && e.currentTarget.contains(block) ? block : e.currentTarget;
+    const sel = window.getSelection();
+    if (sel) {
+      const range = document.createRange();
+      range.selectNodeContents(container);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
   }, []);
 
   const List = React.useMemo(() => {
@@ -266,7 +272,11 @@ export function MessageList({ messages, isLoading, isStreaming, sessionKey }: Me
           </div>
         )}
       />
-      <QuestionRail items={userQuestions} activeId={activeQuestionId} onSelect={handleSelectQuestion} />
+      <QuestionRail
+        items={userQuestions}
+        activeId={activeQuestionId}
+        onSelect={handleSelectQuestion}
+      />
     </div>
   );
 }
