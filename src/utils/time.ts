@@ -1,6 +1,6 @@
 import { format, differenceInMinutes, differenceInHours, differenceInDays } from "date-fns";
 
-const WEEKDAY_NAMES = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const getWeekStart = (d: Date) => {
   const date = new Date(d);
@@ -16,10 +16,10 @@ const formatRelativeNumeric = (value: string) => {
   const diffMinutes = differenceInMinutes(new Date(), date);
   const diffHours = differenceInHours(new Date(), date);
   const diffDays = differenceInDays(new Date(), date);
-  if (diffMinutes < 1) return "刚刚";
-  if (diffMinutes < 60) return `${diffMinutes} 分钟前`;
-  if (diffHours < 24) return `${diffHours} 小时前`;
-  return `${diffDays} 天前`;
+  if (diffMinutes < 1) return "Just now";
+  if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+  return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
 };
 
 export const formatRelativeTime = (value?: string | null) => {
@@ -29,14 +29,14 @@ export const formatRelativeTime = (value?: string | null) => {
   const now = new Date();
   const diffMinutes = differenceInMinutes(now, date);
   const diffHours = differenceInHours(now, date);
-  if (diffMinutes < 1) return "刚刚";
-  if (diffMinutes < 60) return `${diffMinutes} 分钟前`;
+  if (diffMinutes < 1) return "Just now";
+  if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
   if (
     date.getDate() === now.getDate() &&
     date.getMonth() === now.getMonth() &&
     date.getFullYear() === now.getFullYear()
   ) {
-    return `${diffHours} 小时前`;
+    return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
   }
   const yesterday = new Date(now);
   yesterday.setDate(yesterday.getDate() - 1);
@@ -45,16 +45,16 @@ export const formatRelativeTime = (value?: string | null) => {
     date.getMonth() === yesterday.getMonth() &&
     date.getFullYear() === yesterday.getFullYear()
   ) {
-    return `昨天 ${format(date, "HH:mm")}`;
+    return `Yesterday ${format(date, "HH:mm")}`;
   }
   const weekStart = getWeekStart(now);
   if (date >= weekStart) {
     return `${WEEKDAY_NAMES[date.getDay()]} ${format(date, "HH:mm")}`;
   }
   if (date.getFullYear() === now.getFullYear()) {
-    return format(date, "M月d日");
+    return format(date, "MMM d");
   }
-  return format(date, "yyyy年M月d日");
+  return format(date, "MMM d, yyyy");
 };
 
 export const formatFullDateTime = (value?: string | null) => {
