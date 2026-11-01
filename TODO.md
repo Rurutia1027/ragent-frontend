@@ -2,6 +2,28 @@
 
 Copy from tag `1.0.0` of `/Users/emma/LLM/ragent`, under `frontend/`. This version has no Agent.
 
+## This weekend — get the chat app running
+
+Goal: log in, send a message, see the stream land on that reply, and open the session again from the sidebar. Admin does not block this.
+
+### Saturday
+
+- [ ] Make `npm run dev` compile. `src/router.tsx` imports `ChatPage` twice and registers `/chat/:sessionId` twice.
+- [ ] Fix `chatStore` `fetchSessions`: `finally` sets `sessionsLoaded` back to `false`, so an empty sidebar stays on "Loading sessions".
+- [ ] Fix `chatStore` `appendStreamContent`: the id check is inverted (`===` skips the streaming message), so deltas land on the other messages.
+- [ ] Replace the `/` placeholder. Logged out goes to `/login`. Logged in goes to `/chat`.
+- [ ] Guard `/chat` and `/chat/:sessionId`. No token redirects to `/login`.
+- [ ] Walk one path against the backend (`VITE_API_BASE_URL=/api/ragent`): login, new chat, send, stream on the current reply, refresh, click the session in the sidebar.
+- [ ] Leave the sidebar's own session list in place. `SessionList` and `SessionItem` are not mounted yet. Do not swap them in until the path above works.
+
+### Sunday
+
+- [ ] Add the `ErrorBoundary` from the source `App.tsx`.
+- [ ] Open `/admin` without a blank tab. `AdminLayout` is an empty file and there is no `/admin` route. The sidebar Admin button already does `window.open("/admin")`.
+- [ ] One admin screen only: Dashboard. `SimpleLineChart.tsx` is empty. Knowledge, intent tree, ingestion, traces, settings, sample questions, term mappings, and users wait until next week. `CreateKnowledgeBaseDialog.tsx` can stay unused until then.
+
+## Stage 2 — chat
+
 ## Stage 2 — chat
 
 In place: `chatStore`, `sessionService`, `chatService`, `sampleQuestionService`, `useStreamResponse`, `Loading`, `Toast`, `Header`, `Sidebar`, `MainLayout`, the chat components, `ChatPage`, and `/chat` plus `/chat/:sessionId`. Login and 404 stay. The GitHub star count in `Header` is removed on purpose.
@@ -21,14 +43,14 @@ In place: `chatStore`, `sessionService`, `chatService`, `sampleQuestionService`,
 - [x] `src/router.tsx`: `ChatPage` at `/chat` and `/chat/:sessionId`
 - [x] `src/components/common/Toast.tsx`, mounted in `App`
 
-Still wrong or missing:
+Still wrong or missing (order is in "This weekend" above):
 
 - [ ] `chatStore` `fetchSessions`: `finally` sets `sessionsLoaded` back to `false`, so an empty sidebar stays on "Loading sessions".
 - [ ] `chatStore` `appendStreamContent`: the id check is inverted (`===` skips the streaming message), so deltas land on the other messages.
-- [ ] `router.tsx`: `/` is still `Placeholder`. The source sends `/` to `/chat` or `/login`, and `/chat` requires a logged-in user.
+- [ ] `router.tsx`: duplicate `ChatPage` import and duplicate `/chat/:sessionId`. `/` is still `Placeholder`. The source sends `/` to `/chat` or `/login`, and `/chat` requires a logged-in user.
 - [ ] `ErrorBoundary` around the app, as in the source `App.tsx`.
 
-Skip for now: `session/`, `Avatar.tsx`, `RelativeTime.tsx`, `useChat.ts`. The sidebar "Admin" link waits on stage 3.
+`SessionList` / `SessionItem` exist and are not used. The sidebar still renders sessions itself. Skip swapping them in until the chat path works. Also skip `Avatar.tsx` and `useChat.ts`. The sidebar "Admin" link waits on stage 3.
 
 ## Stage 3 — admin
 
