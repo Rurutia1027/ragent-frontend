@@ -208,7 +208,7 @@ export function CreateKnowledgeBaseDialog({
               name="collectionName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Collection名称</FormLabel>
+                  <FormLabel>Collection name</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter collection name" {...field} />
                   </FormControl>
@@ -227,7 +227,7 @@ export function CreateKnowledgeBaseDialog({
                 onClick={() => handleDialogOpenChange(false)}
                 disabled={loading}
               >
-                取消
+                Cancel
               </Button>
               <Button type="submit" disabled={loading}>
                 {loading ? "Creating..." : "Create"}

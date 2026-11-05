@@ -459,7 +459,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this chat?</AlertDialogTitle>
             <AlertDialogDescription>
-              [{deleteTarget?.title || "This chat"}] will be permanently deleted. This cannot be undone.
+              [{deleteTarget?.title || "This chat"}] will be permanently deleted. This cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
