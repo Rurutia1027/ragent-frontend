@@ -21,6 +21,7 @@ import {
   Timer,
   TrendingDown,
   TrendingUp,
+  X,
   Zap
 } from "lucide-react";
 
@@ -776,5 +777,179 @@ const SimpleAreaChart = ({
         ))}
       </div>
     </div>
+  );
+};
+
+// Traffic Overview Section
+const TrafficOverviewSection = ({
+  trends,
+  overview,
+  timeWindow,
+  loading,
+  className
+}: {
+  trends: DashboardTrendBundle;
+  overview: DashboardOverview | null;
+  timeWindow: DashboardTimeWindow;
+  loading?: boolean;
+  className?: string;
+}) => {
+  const chartData = useMemo<AreaChartPoint[]>(() => {
+    const points = trends.messages?.series?.[0]?.data || [];
+    return points.map((p) => ({ ts: p.ts, value: p.value }));
+  }, [trends.messages]);
+
+  const deltaPct = overview?.kpis?.messages24h?.deltaPct;
+  const change = toChange(deltaPct);
+  const showChange = change.trend !== "flat";
+
+  return (
+    <DashCard className={cn("flex flex-col", className)}>
+      <div className="mb-3">
+        <p className="text-sm font-semibold text-slate-700">Traffic Overview</p>
+        {showChange}
+      </div>
+      {loading ? (
+        <LoadingBlock className="h-full flex-1" />
+      ) : chartData.length === 0 ? (
+        <div className="flex flex-1 items-center justify-center text-sm text-slate-400">
+          No data available
+        </div>
+      ) : (
+        <div className="flex-1">
+          <SimpleAreaChart data={chartData} timeWindow={timeWindow} valueLable="" />
+        </div>
+      )}
+    </DashCard>
+  );
+};
+
+// Trend Charts
+const mapSeries = (trend: DashboardTrends | null, tone: TrendSeries["tone"]): TrendSeries[] => {
+  if (!trend?.series?.length) return [];
+  return trend.series.map((s) => ({ name: s.name, data: s.data, tone }));
+};
+
+const mapQualitySeries = (trend: DashboardTrends | null): TrendSeries[] => {
+  if (!trend?.series?.length) return [];
+  return trend.series.map((s) => ({
+    name: s.name,
+    data: s.data,
+    tone: s.name.includes("error") ? "danger" : "info"
+  }));
+};
+
+const TrendChartItem = ({
+  title,
+  series,
+  thresholds = [],
+  xAxisMode,
+  yAxisType = "number",
+  yAxisLabel,
+  loading
+}: {
+  title: string;
+  series: TrendSeries[];
+  thresholds?: ChartThreshold[];
+  xAxisMode: ChartXAxisMode;
+  yAxisType?: ChartYAxisType;
+  yAxisLable?: string;
+  loading?: boolean;
+}) => {
+  if (loading) {
+    return (
+      <div className="rounded-xl bg-slate-50 p-40">
+        <LoadingBlock className="mb-3 h-4 w-24" />
+        <LoadingBlock className="h-48 w-full" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl bg-slate-50 p-4">
+      <div className="mb-1 text-xs font-medium text-slate-500">{title}</div>
+      {yAxisLabel && <p className="mb-2 text-[11px] text-slate-400">{yAxisLabel}</p>}
+      <div className="h-48">
+        <SimpleLineChart
+          series={series}
+          xAxisMode={xAxisMode}
+          yAxisType={yAxisType}
+          thresholds={thresholds}
+          height={192}
+          theme="light"
+          yAxisTickCount={4}
+        />
+      </div>
+    </div>
+  );
+};
+
+const TrendSection = ({
+  trends,
+  timeWindow,
+  loading
+}: {
+  trends: DashboardTrendBundle;
+  timeWindow: DashboardTimeWindow;
+  loading?: boolean;
+}) => {
+  const xAxisMode = timeWindow === "24h" ? "hour" : "date";
+
+  const sessionSeries = useMemo(() => mapSeries(trends.sessions, "success"), [trends.sessions]);
+  const activeSeries = useMemo(
+    () => mapSeries(trends.activeUsers, "primary"),
+    [trends.activeUsers]
+  );
+  const latencySeries = useMemo(() => mapSeries(trends.latency, "warning"), [trends.latency]);
+  const qualitySeries = useMemo(() => mapQualitySeries(trends.quality), [trends.quality]);
+
+  return (
+    <DashCard>
+      <CardTitle>Trends Analysis</CardTitle>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <TrendChartItem
+          title="Session Trend"
+          series={sessionSeries}
+          xAxisMode={xAxisMode}
+          yAxisLable="Unit: time"
+          loading={loading}
+        />
+        <TrendChartItem
+          title="Active Users Trend"
+          series={activeSeries}
+          xAxisMode={xAxisMode}
+          yAxisLable="Unit: user"
+          loading={loading}
+        />
+        <TrendChartItem
+          title="Reaction Time Trend"
+          series={latencySeries}
+          xAxisMode={xAxisMode}
+          yAxisType="duration"
+          yAxisLable="Unit: ms"
+          loading={loading}
+          thresholds={[
+            { value: DASHBOARD_THRESHOLDS.latency.good, label: "Healthy ≤10s", tone: "info" },
+            { value: DASHBOARD_THRESHOLDS.latency.warning, label: "Warning >15s", tone: "critical" }
+          ]}
+        />
+        <TrendChartItem
+          title="Quality Trend"
+          series={qualitySeries}
+          xAxisMode={xAxisMode}
+          yAxisType="percent"
+          yAxisLable="Unit: %"
+          loading={loading}
+          thresholds={[
+            { value: DASHBOARD_THRESHOLDS.errorRate.warning, label: "No warning", tone: "warning" },
+            {
+              value: DASHBOARD_THRESHOLDS.noDocRate.warning,
+              label: "No knowledge warning",
+              tone: "critical"
+            }
+          ]}
+        />
+      </div>
+    </DashCard>
   );
 };
