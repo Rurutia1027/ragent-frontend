@@ -11,7 +11,8 @@ import {
 import {
   Activity,
   AlertCircle,
-  BarChatrt3,
+  BarChart3,
+  Car,
   Clock,
   Info,
   Lightbulb,
@@ -309,128 +310,471 @@ const useHealthStatus = (
   return { health, metricStatus };
 };
 
+// base components
+const DashCard = ({ children, className }: { children: ReactNode; className?: string }) => (
+  <div className={cn("rounded-2xl bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.08)]", className)}>
+    {children}
+  </div>
+);
+const CardTitle = ({ children }: { children: ReactNode }) => (
+  <h3 className="mb-4 text-sm font-semibold text-slate-700">{children}</h3>
+);
 
-// base components 
-const DashCard = ({children, className}: { children: ReactNode, className?: string}) => (
-    <div className={cn("rounded-2xl bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.08)]", className)}>
-        {children}
-    </div>
-); 
-const CardTitle = ({children}: {children: ReactNode}) => (
-    <h3 className="mb-4 text-sm font-semibold text-slate-700">{children}</h3>
-); 
+const LoadingBlock = ({ className }: { className?: string }) => (
+  <div className={cn("animate-pulse rounded-lg bg-slate-100", className)} />
+);
 
-const LoadingBlock = ({ className }: {className?: string}) => (
-    <div className={cn("animate-pulse rounded-lg bg-slate-100", className)}/>
-); 
-
-// Header 
-const HEALTH_CONFIG: Record<HealthStatus, {bg: string, text: string, label: string}> = {
-    healthy: {bg: "bg-emerald-100", text: "text-emerald-700", label: "Healthy"}, 
-    attention: {bg: "bg-amber-100", text: "text-amber-700", label: "Attention"}, 
-    critical: {bg: "bg-red-100", text: "text-red-700", label: "Critical"}, 
-    unknown: {bg: "bg-slate-100", text: "text-slate-500", label: "Unknown"}
-}; 
+// Header
+const HEALTH_CONFIG: Record<HealthStatus, { bg: string; text: string; label: string }> = {
+  healthy: { bg: "bg-emerald-100", text: "text-emerald-700", label: "Healthy" },
+  attention: { bg: "bg-amber-100", text: "text-amber-700", label: "Attention" },
+  critical: { bg: "bg-red-100", text: "text-red-700", label: "Critical" },
+  unknown: { bg: "bg-slate-100", text: "text-slate-500", label: "Unknown" }
+};
 
 const DashboardHeader = ({
-    timeWindow, 
-    lastUpdated, 
-    loading, 
-    onRefresh, 
-    onTimeWindowChange}: {
-        timeWindow: DashboardTimeWindow; 
-        lastUpdated: number | null; 
-        loading?: boolean; 
-        onRefresh: () => void; 
-        onTimeWindowChange: (window: DashboardTimeWindow) => void; }) => (
-            <header className="mb-3 flex items-center justify-between">
-                <h1 className="flex items-center gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="inline-flex rounded-lg bg-white p-1 shadow-sm">
-                            {
-                                WINDOW_OPTIONS.map((opt) => (
-                                    <button
-                                    key={opt.value}
-                                    onClick={() => onTimeWindowChange(opt.value)}
-                                    disabled={loading}
-                                    className={cn(
-                                        "rounded-md px-3 py-1.5 text-sm font-medium transition-all", 
-                                        timeWindow === opt.value 
-                                        ? "bg-slate-900 text-white"
-                                        : "text-slate-500 hover:text-slate-700"
-                                    )}>
-                                        {opt.label}
-                                    </button>
-                                ))}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-slate-400">
-                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"/>
-                            <span>{formatLastUpdated(lastUpdated)}</span>
-                        </div>
-
-                        <Button 
-                        variant="outline"
-                        size="icon"
-                        onClick={onRefresh}
-                        disabled={loading}
-                        className="h-9 w-9 rounded-lg border-slate-200 bg-white text-slate-500 hover:text-slate-700">
-                            <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")}/>
-                        </Button>
-                    </div>
-                </h1>
-            </header>
-); 
-
-// KPI Cards 
-type KPICardProps = {
-    value: string | number; 
-    label: string; 
-    change?: KPIChange; 
-    icon: ReactNode; 
-    iconBg: string; 
-    iconColor: string; 
-}; 
-
-const KPICardItem = ({value, label, change, icon, iconBg, iconColor}: KPICardProps) => {
-    const showChange = change && change.trend !== "flat"; 
-    const isUp = change?.trend === "up"; 
-    const changePositive = change?.isPositive; 
-
-    const changeColor =  
-        showChange && ((isUp && changePositive) || (!isUp && !changePositive))
-        ? "text-emerald-600"
-        : "text-red-500"; 
-    return (
-        <div className="rounded-xl bg-slate-50 p-4">
-            <div className="flex items-start justify-between">
-                <div>
-                    <p className="text-2xl font-bold tracking-tight text-slate-900">{value}</p>
-                    <p className="mt-1 text-sm text-slate-500">{label}</p>
-                </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl"
-                style={{backgroundColor: iconBg, color: iconColor}}>
-                    {icon}
-                </div>
-            </div>
-
-            <div className="mt-3 flex items-center gap-1.5 text-sm">
-            {showChange ? (
-              <>
-                {isUp ? (
-                    <TrendingUp className={cn("h-4 w-4", changeColor)} />
-                ) : (
-                    <TrendingDown className={cn("h-4 w-4", changeColor)} />
-                )}
-                <span className={cn("font-medium", changeColor)}>
-              {change!.value > 0 ? "+" : ""}
-                  {change!.value.toFixed(1)}%
-            </span>
-                <span className="text-slate-400">较上周期</span>
-              </>
-          ) : (
-              <span className="text-slate-400">--</span>
-          )}
-            </div>
+  timeWindow,
+  lastUpdated,
+  loading,
+  onRefresh,
+  onTimeWindowChange
+}: {
+  timeWindow: DashboardTimeWindow;
+  lastUpdated: number | null;
+  loading?: boolean;
+  onRefresh: () => void;
+  onTimeWindowChange: (window: DashboardTimeWindow) => void;
+}) => (
+  <header className="mb-3 flex items-center justify-between">
+    <h1 className="flex items-center gap-3">
+      <div className="flex items-center gap-3">
+        <div className="inline-flex rounded-lg bg-white p-1 shadow-sm">
+          {WINDOW_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => onTimeWindowChange(opt.value)}
+              disabled={loading}
+              className={cn(
+                "rounded-md px-3 py-1.5 text-sm font-medium transition-all",
+                timeWindow === opt.value
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
-    ); 
-}
+        <div className="flex items-center gap-2 text-sm text-slate-400">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          <span>{formatLastUpdated(lastUpdated)}</span>
+        </div>
+
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={onRefresh}
+          disabled={loading}
+          className="h-9 w-9 rounded-lg border-slate-200 bg-white text-slate-500 hover:text-slate-700"
+        >
+          <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+        </Button>
+      </div>
+    </h1>
+  </header>
+);
+
+// KPI Cards
+type KPICardProps = {
+  value: string | number;
+  label: string;
+  change?: KPIChange;
+  icon: ReactNode;
+  iconBg: string;
+  iconColor: string;
+};
+
+const KPICardItem = ({ value, label, change, icon, iconBg, iconColor }: KPICardProps) => {
+  const showChange = change && change.trend !== "flat";
+  const isUp = change?.trend === "up";
+  const changePositive = change?.isPositive;
+
+  const changeColor =
+    showChange && ((isUp && changePositive) || (!isUp && !changePositive))
+      ? "text-emerald-600"
+      : "text-red-500";
+  return (
+    <div className="rounded-xl bg-slate-50 p-4">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-2xl font-bold tracking-tight text-slate-900">{value}</p>
+          <p className="mt-1 text-sm text-slate-500">{label}</p>
+        </div>
+        <div
+          className="flex h-10 w-10 items-center justify-center rounded-xl"
+          style={{ backgroundColor: iconBg, color: iconColor }}
+        >
+          {icon}
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center gap-1.5 text-sm">
+        {showChange ? (
+          <>
+            {isUp ? (
+              <TrendingUp className={cn("h-4 w-4", changeColor)} />
+            ) : (
+              <TrendingDown className={cn("h-4 w-4", changeColor)} />
+            )}
+            <span className={cn("font-medium", changeColor)}>
+              {change!.value > 0 ? "+" : ""}
+              {change!.value.toFixed(1)}%
+            </span>
+            <span className="text-slate-400">Compare to previous period</span>
+          </>
+        ) : (
+          <span className="text-slate-400">--</span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const toChange = (deltaPct?: number | null): KPIChange => {
+  if (deltaPct === null || deltaPct === undefined) {
+    return { value: 0, trend: "flat", isPositive: false };
+  }
+  if (deltaPct > 0) return { value: deltaPct, trend: "up", isPositive: true };
+  if (deltaPct < 0) return { value: deltaPct, trend: "down", isPositive: false };
+  return { value: 0, trend: "flat", isPositive: true };
+};
+
+const KPISection = ({ overview }: { overview: DashboardOverview | null }) => {
+  const kpis = overview?.kpis;
+  const sessionDepth =
+    (kpis?.sessions24h.value ?? 0) > 0
+      ? (kpis?.sessions24h.value ?? 0) / (kpis?.sessions24h.value ?? 1)
+      : 0;
+
+  const items: KPICardProps[] = [
+    {
+      value: formatNumber(kpis?.activeUsers.value),
+      label: "Active Users",
+      change: toChange(kpis?.activeUsers.deltaPct),
+      icon: <Activity className="h-5 w-5" />,
+      iconBg: "#DBEAFE",
+      iconColor: "#2563EB"
+    },
+    {
+      value: formatNumber(kpis?.sessions24h.value),
+      label: "Sessions",
+      change: toChange(kpis?.sessions24h.deltaPct),
+      icon: <BarChart3 className="h-5 w-5" />,
+      iconBg: "#E0E7FF",
+      iconColor: "#4F46E5"
+    },
+    {
+      value: formatNumber(kpis?.messages24h.value),
+      label: "Messages",
+      change: toChange(kpis?.messages24h.deltaPct),
+      icon: <Zap className="h-5 w-5" />,
+      iconBg: "#FEF3C7",
+      iconColor: "#D97706"
+    },
+    {
+      value: sessionDepth === null ? "--" : formatRatio(sessionDepth),
+      label: "Session Depth",
+      change: undefined,
+      icon: <BarChart3 className="h-5 w-5" />,
+      iconBg: "#E0F2FE",
+      iconColor: "#0284C7"
+    }
+  ];
+
+  return (
+    <DashCard>
+      <CardTitle>Key Performance Indicators</CardTitle>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {items.map((item) => (
+          <KPICardItem key={item.label} {...item} />
+        ))}
+      </div>
+    </DashCard>
+  );
+};
+
+// ============================================================================
+// Area Chart Component
+// ============================================================================
+type AreaChartPoint = { ts: number; value: number };
+
+const SimpleAreaChart = ({
+  data,
+  height = 160,
+  timeWindow,
+  valueLable = "message number"
+}: {
+  data: AreaChartPoint[];
+  height?: number;
+  timeWindow: DashboardTimeWindow;
+  valueLable?: string;
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [, setDimensions] = useState({ width: 0, height: 0 });
+  const [tooltip, setTooltip] = useState<{
+    show: boolean;
+    x: number;
+    y: number;
+    value: number;
+    label: string;
+  } | null>(null);
+
+  // monitor of effect,monotring the size of the conainer
+  // so the container size modified the interanl logical will be triggered and executed
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        setDimensions({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height
+        });
+      }
+    });
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  const maxValue = useMemo(() => Math.max(1, ...data.map((d) => d.value)), [data]);
+
+  // Y axis ticks
+  const yTicks = useMemo(() => {
+    const tickCount = 4;
+    const step = maxValue / (tickCount - 1);
+    return Array.from({ length: tickCount }, (_, i) => Math.round(step * (tickCount - i - 1)));
+  }, [maxValue]);
+
+  const xLabels = useMemo(() => {
+    if (data.length === 0) return [];
+    const count = timeWindow === "24h" ? 6 : 5;
+    const step = Math.max(1, Math.floor((data.length - 1) / (count - 1)));
+
+    return Array.from({ length: count }, (_, i) => {
+      const idx = Math.min(i * step, data.length - 1);
+      const point = data[idx];
+      if (!point) return null;
+
+      const date = new Date(point.ts);
+      const label =
+        timeWindow === "24h"
+          ? date.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false })
+          : date.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" });
+
+      return { position: i / (count - 1), label };
+    }).filter(Boolean) as Array<{ position: number; label: string }>;
+  }, [data, timeWindow]);
+
+  // generate svg path
+  const { linePath, areaPath, points } = useMemo(() => {
+    if (data.length === 0) return { linePath: "", areaPath: "", points: [] };
+
+    const pts = data.map((d, i) => ({
+      x: i / Math.max(1, data.length - 1),
+      y: 1 - d.value / maxValue,
+      ts: d.ts,
+      value: d.value
+    }));
+
+    if (pts.length === 1) {
+      return {
+        linePath: `M ${pts[0].x} ${pts[0].y}`,
+        areaPath: `M ${pts[0].x} 1 L ${pts[0].x} ${pts[0].y} L ${pts[0].x} 1 Z`,
+        points: pts
+      };
+    }
+
+    let line = `M ${pts[0].x} ${pts[0].y}`;
+    for (let i = 1; i < pts.length; i++) {
+      const prev = pts[i - 1];
+      const curr = pts[i];
+      const cpx1 = prev.x + (curr.x - prev.x) * 0.4;
+      const cpx2 = prev.x + (curr.x - prev.x) * 0.6;
+      line += ` C ${cpx1} ${prev.y}, ${cpx2} ${curr.y}, ${curr.x} ${curr.y}`;
+    }
+
+    const area = `${line} L ${pts[pts.length - 1].x} 1 L ${pts[0].x} 1 Z`;
+    return { linePath: line, areaPath: area, points: pts };
+  }, [data, maxValue]);
+
+  const formatLabel = (ts: number) => {
+    const date = new Date(ts);
+    if (timeWindow === "24h") {
+      return date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      });
+    }
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const chartArea = e.currentTarget;
+    const react = chartArea.getBoundingClientRect();
+    const relativeX = (e.clientX - react.left) / react.width;
+
+    if (relativeX < 0 || relativeX > 1 || points.length === 0) {
+      setTooltip(null);
+      return;
+    }
+
+    let closestIdx = 0;
+    let minDist = Infinity;
+    points.forEach((pt, i) => {
+      const dist = Math.abs(pt.x - relativeX);
+      if (dist < minDist) {
+        minDist = dist;
+        closestIdx = i;
+      }
+    });
+
+    const pt = points[closestIdx];
+    setTooltip({
+      show: true,
+      x: pt.x * react.width,
+      y: pt.y * react.height,
+      value: pt.value,
+      label: formatLabel(pt.ts)
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setTooltip(null);
+  };
+
+  const PADDING = { left: 40, right: 8, top: 8, bottom: 32 };
+
+  return (
+    <div ref={containerRef} className="relative h-full w-full" style={{ minHeight: height }}>
+      <div
+        className="absolute flex flex-col justify-between"
+        style={{
+          left: 0,
+          top: PADDING.top,
+          width: PADDING.left - 4,
+          height: `calc(100% - ${PADDING.top + PADDING.bottom}px)`
+        }}
+      >
+        {yTicks.map((tick, i) => (
+          <span key={i} className="pr-1 text-right text-[10px] leading-none text-slate-400">
+            {formatCompactNumber(tick)}
+          </span>
+        ))}
+      </div>
+
+      <div className="absolute left-0 top-0 text-[10px] text-slate-400">{valueLabel}</div>
+
+      <div
+        className="absolute cursor-crosshair"
+        style={{
+          left: PADDING.left,
+          top: PADDING.top,
+          right: PADDING.right,
+          bottom: PADDING.bottom
+        }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div className="pointer-events-none absolute inset-0">
+          {yTicks.map((_, i) => (
+            <div
+              key={i}
+              className="absolute left-0 right-0 border-t border-dashed border-slate-100"
+              style={{ top: `${(i / (yTicks.length - 1)) * 100}%` }}
+            />
+          ))}
+        </div>
+
+        <svg
+          className="absolute inset-0 h-full w-full overflow-visible"
+          viewBox="0 0 1 1"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <linearGradient id="trafficGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+          <path d={areaPath} fill="url(#trafficGradient)" />
+          <path
+            d={linePath}
+            fill="none"
+            stroke="#3B82F6"
+            strokeWidth="2"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+
+        {/* Tooltip */}
+        {tooltip?.show && (
+          <>
+            <div
+              className="pointer-events-none absolute top-0 h-full w-px bg-slate-300"
+              style={{ left: tooltip.x }}
+            />
+
+            <div
+              className="pointer-events-none absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-blue-500 bg-white shadow-sm"
+              style={{ left: tooltip.x, top: tooltip.y }}
+            />
+
+            <div
+              className="pointer-events-none absolute z-10 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-800 px-2.5 py-1.5 text-xs text-white shadow-lg"
+              style={{
+                left: tooltip.x,
+                top: Math.max(0, tooltip.y - 48)
+              }}
+            >
+              <div className="font-medium">{tooltip.label}</div>
+              <div className="flex items-center gap-1">
+                <span className="h-2 w-2 rounded-sm bg-blue-400" />
+                <span>
+                  {valueLable}: {tooltip.value}
+                </span>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div
+        className="absolute flex justify-between"
+        style={{
+          left: PADDING.left,
+          right: PADDING.right,
+          bottom: 8,
+          height: 16
+        }}
+      >
+        {xLabels.map((item, i) => (
+          <span
+            key={i}
+            className="text-[10px] text-slate-400"
+            style={{
+              position: "absolute",
+              left: `${item.position * 100}%`,
+              transform: "translateX(-50%)"
+            }}
+          >
+            {item.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
